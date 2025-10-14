@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Booking Page";
+}
+@model List<Passenger>
+
+<body style="background-color: pink; font-family: Arial, sans-serif; margin: 0; padding: 0;">
+
+    <div style="
+        border: 5px solid black;
+        background-color: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 40px auto;
+        width: 95%;
+        max-width: 1300px;
+        text-align: center;
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+    ">
+
+        <!-- Heading -->
+        <h1 style="
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            padding: 10px 30px;
+            display: inline-block;
+            border: 5px solid black;
+            border-radius: 20px;
+            background-color: pink;
+        ">
+            Booking Information
+        </h1>
+
+        <!-- Table -->
+        <table class="table" style="
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        ">
+            <thead>
+                <tr style="background-color: pink; color: black;">
+                    <th style="border: 3px solid black; padding: 10px;">Booking Id No.</th>
+                    <th style="border: 3px solid black; padding: 10px;">Passenger Name</th>
+                    <th style="border: 3px solid black; padding: 10px;">Route</th>
+                    <th style="border: 3px solid black; padding: 10px;">Bus No</th>
+                    <th style="border: 3px solid black; padding: 10px;">Seat No.</th>
+                    <th style="border: 3px solid black; padding: 10px;">Booking Date</th>
+                    <th style="border: 3px solid black; padding: 10px;">Status</th>
+                    <th style="border: 3px solid black; padding: 10px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var passenger in Model)
+                {
+                    <tr style="background-color: #fdfdfd;">
+                    
+                        <td style="border: 2px solid black; padding: 10px;">@passenger.BookingId</td>
+                        <td style="border: 2px solid black; padding: 10px;">@passenger.Name</td>
+                        <td style="border: 2px solid black; padding: 10px;">@passenger.Departure → @passenger.Arrival</td>
+                        <td style="border: 2px solid black; padding: 10px;">@passenger.BusNo</td>
+                        <td style="border: 2px solid black; padding: 10px;">@passenger.SeatNo</td>
+                        <td style="border: 2px solid black; padding: 10px;">@passenger.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td style="border: 2px solid black; padding: 10px;">@passenger.Status</td>
+                        <td style="border: 2px solid black; padding: 10px;">
+                            <a asp-action="Booking" asp-route-id="@passenger.BookingId"
+                               style="margin-right: 10px; color: blue; text-decoration: underline;">Edit</a>
+                            <a asp-action="DeleteBook" asp-route-id="@passenger.BookingId"
+                               style="color: red; text-decoration: underline;">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>

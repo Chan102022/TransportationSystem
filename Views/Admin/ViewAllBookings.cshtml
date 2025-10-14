@@ -1,0 +1,31 @@
+﻿@model List<TransportationBookingSystem.Models.Passenger>
+
+<h2>All Bookings</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Passenger Name</th>
+            <th>Route</th>
+            <th>Fare</th>
+            <th>Bus No</th>
+            <th>Seat No</th>
+            <th>Booking Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var booking in Model)
+        {
+            <tr>
+                <td>@booking.Name</td>
+                <td>@booking.Departure → @booking.Arrival</td>
+                <td>@booking.Fare.ToString("N2")</td>
+                <td>@booking.BusNo</td>
+                <td>@booking.SeatNo</td>
+                <td>@booking.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@booking.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>

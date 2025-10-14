@@ -1,0 +1,184 @@
+﻿@model TransportationBookingSystem.Models.Passenger
+@{
+    ViewData["Title"] = "Booking";
+}
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        const fareTable = {
+            "Manila-Cebu City": 1500,
+            "Cebu City-Manila": 1500,
+
+            "Manila-Davao City": 2800,
+            "Davao City-Manila": 2800,
+
+            "Manila-Baguio": 800,
+            "Baguio-Manila": 800,
+
+            "Manila-Tagaytay": 300,
+            "Tagaytay-Manila": 300,
+
+            "Cebu City-Davao City": 1600,
+            "Davao City-Cebu City": 1600,
+
+            "Cebu City-Baguio": 1800,
+            "Baguio-Cebu City": 1800,
+
+            "Cebu City-Tagaytay": 1400,
+            "Tagaytay-Cebu City": 1400,
+
+            "Davao City-Baguio": 2200,
+            "Baguio-Davao City": 2200,
+
+            "Davao City-Tagaytay": 2500,
+            "Tagaytay-Davao City": 2500,
+
+            "Baguio-Tagaytay": 900,
+            "Tagaytay-Baguio": 900
+        };
+
+        const departureSelect = document.querySelector('select[name="Departure"]');
+        const arrivalSelect = document.querySelector('select[name="Arrival"]');
+        const fareDisplay = document.getElementById("fareDisplay");
+
+        function updateFare() {
+            const dep = departureSelect.value;
+            const arr = arrivalSelect.value;
+
+            if (!dep || !arr || dep === arr) {
+                fareDisplay.value = "";
+                return;
+            }
+
+            const key = `${dep}-${arr}`;
+            if (fareTable[key] !== undefined) {
+                fareDisplay.value = fareTable[key]; // Numeric value only
+            } else {
+                fareDisplay.value = "";
+                alert("Fare not available for selected route.");
+            }
+        }
+
+        departureSelect.addEventListener("change", updateFare);
+        arrivalSelect.addEventListener("change", updateFare);
+    </script>
+}
+
+<style>
+    #bookNowBtn {
+        transition: transform 0.3s ease;
+    }
+
+        #bookNowBtn:hover {
+            transform: scale(1.25);
+            cursor: pointer;
+        }
+</style>
+
+<body style="background-color: pink;">
+    <div class="container" style="max-width: 800px; margin-top: 40px; border: 5px solid black; padding: 30px; border-radius: 20px; background-color: white;">
+        <h1 class="text-center mb-4" style="border-radius: 20px; padding: 10px 0;">Book Now</h1>
+
+        <form asp-action="BookingForm" asp-controller="Home" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input asp-for="BookingId" type="hidden" />
+            <input asp-for="BusNo" type="hidden" />
+            <input asp-for="SeatNo" type="hidden" />
+            <input asp-for="BookingDate" type="hidden" />
+            <input asp-for="UserId" type="hidden" />
+
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label">Bus No</label>
+                <div class="col-sm-9">
+                    <input class="form-control" type="text" value="@Model.BusNo" readonly />
+                </div>
+            </div>
+
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label">Seat No</label>
+                <div class="col-sm-9">
+                    <input class="form-control" type="text" value="@Model.SeatNo" readonly />
+                </div>
+            </div>
+
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label">Booking Date</label>
+                <div class="col-sm-9">
+                    <input class="form-control" type="text" value="@Model.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")" readonly />
+                </div>
+            </div>
+
+            <div class="mb-3 row align-items-center">
+                <label asp-for="Name" class="col-sm-3 col-form-label"></label>
+                <div class="col-sm-9">
+                    <input asp-for="Name" class="form-control" placeholder="Enter Your Name" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Departure -->
+            <div class="mb-3 row align-items-center">
+                <label asp-for="Departure" class="col-sm-3 col-form-label"></label>
+                <div class="col-sm-9">
+                    <select asp-for="Departure" class="form-select" required>
+                        <option value="" disabled selected hidden>Select Departure</option>
+                        <option>Manila</option>
+                        <option>Cebu City</option>
+                        <option>Davao City</option>
+                        <option>Baguio</option>
+                        <option>Tagaytay</option>
+                    </select>
+                    <span asp-validation-for="Departure" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Arrival -->
+            <div class="mb-3 row align-items-center">
+                <label asp-for="Arrival" class="col-sm-3 col-form-label"></label>
+                <div class="col-sm-9">
+                    <select asp-for="Arrival" class="form-select" required>
+                        <option value="" disabled selected hidden>Select Arrival</option>
+                        <option>Manila</option>
+                        <option>Cebu City</option>
+                        <option>Davao City</option>
+                        <option>Baguio</option>
+                        <option>Tagaytay</option>
+                    </select>
+                    <span asp-validation-for="Arrival" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Fare Display -->
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label">Estimated Fare</label>
+                <div class="col-sm-9">
+                    <input id="fareDisplay" class="form-control" type="number" asp-for="Fare" readonly placeholder="Select Departure and Arrival" />
+                </div>
+            </div>
+
+            <div class="mb-4 row align-items-center">
+                <label asp-for="Status" class="col-sm-3 col-form-label"></label>
+                <div class="col-sm-9">
+                    <select asp-for="Status" class="form-select" required>
+                        <option value="" disabled selected hidden>Select Status</option>
+                        <option>Pending</option>
+                        <option>Confirmed</option>
+                        <option>Canceled</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="bookNowBtn" type="submit" class="btn btn-outline-dark px-5 py-2 fw-bold" style="border-width: 3px;">
+                    Book Now
+                </button>
+            </div>
+        </form>
+    </div>
+</body>

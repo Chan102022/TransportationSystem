@@ -1,0 +1,74 @@
+﻿@model List<TransportationBookingSystem.Models.Passenger>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    body {
+        background-color: pink;
+    }
+
+    .card {
+        background-color: white;
+        border: 2px solid black;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    table th, table td {
+        vertical-align: middle !important;
+    }
+
+    .form-inline select {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Admin Dashboard</h1>
+
+    <div class="card">
+        <h4>All Bookings</h4>
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Passenger Name</th>
+                    <th>Route</th>
+                    <th>Fare (₱)</th>
+                    <th>Bus No</th>
+                    <th>Seat No</th>
+                    <th>Booking Date</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var booking in Model )
+                {
+                    <tr>
+                        <td>@booking.Name</td>
+                        <td>@booking.Departure → @booking.Arrival</td>
+                        <td>@booking.Fare.ToString("N2")</td>
+                        <td>@booking.BusNo</td>
+                        <td>@booking.SeatNo</td>
+                        <td>@booking.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@booking.Status</td>
+                        <td>
+                            <form asp-action="UpdateStatus" asp-controller="Admin" method="post" class="d-flex">
+                                <input type="hidden" name="BookingId" value="@booking.BookingId" />
+                                <select name="Status" class="form-select me-2">
+                                    <option value="Pending" selected="@((booking.Status == "Pending") ? "selected" : null)">Pending</option>
+                                    <option value="Confirmed" selected="@((booking.Status == "Confirmed") ? "selected" : null)">Confirmed</option>
+                                    <option value="Canceled" selected="@((booking.Status == "Canceled") ? "selected" : null)">Canceled</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-dark">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
