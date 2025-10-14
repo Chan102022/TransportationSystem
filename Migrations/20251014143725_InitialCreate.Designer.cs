@@ -12,7 +12,7 @@ using TransportationBookingSystem.Models;
 namespace TransportationBookingSystem.Migrations
 {
     [DbContext(typeof(TransportationBookingSystemDbContext))]
-    [Migration("20251013084151_InitialCreate")]
+    [Migration("20251014143725_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

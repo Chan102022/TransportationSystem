@@ -187,4 +187,5 @@ C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
+C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\obj\Debug\net8.0\TransportationBookingSystem.sourcelink.json
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -71,11 +71,11 @@ namespace TransportationBookingSystem.Controllers
                 await _userManager.AddToRoleAsync(user, model.Role);
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
-                // 🔁 Redirect based on role
+                // ✅ Redirect based on role
                 if (model.Role == "Admin")
-                    return RedirectToAction("Dashboard", "Home"); // Admin Dashboard
+                    return RedirectToAction("Dashboard", "Admin"); // ✅ Correct controller
                 else
-                    return RedirectToAction("Index", "Home"); // Default user page
+                    return RedirectToAction("Index", "Home");
             }
 
             foreach (var error in result.Errors)
@@ -110,12 +110,10 @@ namespace TransportationBookingSystem.Controllers
 
             if (result.Succeeded)
             {
-                // 🔁 Get user roles
                 var roles = await _userManager.GetRolesAsync(user);
 
-                // 🔁 Redirect based on role
                 if (roles.Contains("Admin"))
-                    return RedirectToAction("Dashboard", "Admin");
+                    return RedirectToAction("Dashboard", "Admin"); // ✅ Corrected
                 else
                     return RedirectToAction("Index", "Home");
             }
@@ -139,7 +137,6 @@ namespace TransportationBookingSystem.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // ===== Forgot Password =====
         [HttpGet]
         public IActionResult ForgotPassword() => View();
 
@@ -154,13 +151,14 @@ namespace TransportationBookingSystem.Controllers
             if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
 
+            // Normally you'd send a reset token here
+
             return RedirectToAction(nameof(ForgotPasswordConfirmation));
         }
 
         [HttpGet]
         public IActionResult ForgotPasswordConfirmation() => View();
 
-        // ===== Reset Password =====
         [HttpGet]
         public IActionResult ResetPassword(string token = null, string email = null)
         {

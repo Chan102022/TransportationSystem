@@ -10,18 +10,18 @@
     if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
-        var roles = await UserManager.GetRolesAsync(user);
-        isAdmin = roles.Contains("Admin");
+        if (user != null)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+            isAdmin = roles.Contains("Admin");
+        }
     }
 }
 
 <body style="background-color: pink; font-family: Arial, sans-serif; margin: 0; padding: 0;">
 
     <!-- Page Header -->
-    <div style="
-        text-align: center;
-        padding: 40px 20px 20px 20px;
-    ">
+    <div style="text-align: center; padding: 40px 20px 20px 20px;">
         <h1 style="
             font-size: 3rem;
             display: inline-block;
@@ -56,62 +56,40 @@
         <div style="text-align: center;">
             @if (isAdmin)
             {
+                <!-- Admin View -->
                 <a asp-controller="Admin" asp-action="Dashboard"
-                   style="
-                           background-color: white;
-                           color: black;
-                           font-weight: bold;
-                           padding: 12px 25px;
-                           margin: 10px;
-                           border: 5px solid black;
-                           border-radius: 10px;
-                           text-decoration: none;
-                           transition: transform 0.3s ease;
-                           display: inline-block;
-                       "
+                   style="background-color: white; color: black; font-weight: bold;
+                              padding: 12px 25px; margin: 10px; border: 5px solid black;
+                              border-radius: 10px; text-decoration: none; transition: transform 0.3s ease;
+                              display: inline-block;"
                    onmouseover="this.style.transform='scale(1.1)'"
                    onmouseout="this.style.transform='scale(1)'">
-                    View All Bookings (Admin)
+                    Admin Dashboard
                 </a>
             }
             else
             {
+                <!-- Regular User View -->
                 <a asp-controller="Home" asp-action="Book"
-                   style="
-                           background-color: white;
-                           color: black;
-                           font-weight: bold;
-                           padding: 12px 25px;
-                           margin: 10px;
-                           border: 5px solid black;
-                           border-radius: 10px;
-                           text-decoration: none;
-                           transition: transform 0.3s ease;
-                           display: inline-block;
-                       "
+                   style="background-color: white; color: black; font-weight: bold;
+                              padding: 12px 25px; margin: 10px; border: 5px solid black;
+                              border-radius: 10px; text-decoration: none; transition: transform 0.3s ease;
+                              display: inline-block;"
                    onmouseover="this.style.transform='scale(1.1)'"
                    onmouseout="this.style.transform='scale(1)'">
                     View Existing Bookings
                 </a>
-            }
 
-            <a asp-controller="Home" asp-action="Booking"
-               style="
-                   background-color: white;
-                   color: black;
-                   font-weight: bold;
-                   padding: 12px 25px;
-                   margin: 10px;
-                   border: 5px solid black;
-                   border-radius: 10px;
-                   text-decoration: none;
-                   transition: transform 0.3s ease;
-                   display: inline-block;
-               "
-               onmouseover="this.style.transform='scale(1.1)'"
-               onmouseout="this.style.transform='scale(1)'">
-                Book Now
-            </a>
+                <a asp-controller="Home" asp-action="Booking"
+                   style="background-color: white; color: black; font-weight: bold;
+                              padding: 12px 25px; margin: 10px; border: 5px solid black;
+                              border-radius: 10px; text-decoration: none; transition: transform 0.3s ease;
+                              display: inline-block;"
+                   onmouseover="this.style.transform='scale(1.1)'"
+                   onmouseout="this.style.transform='scale(1)'">
+                    Book Now
+                </a>
+            }
         </div>
     </div>
 
