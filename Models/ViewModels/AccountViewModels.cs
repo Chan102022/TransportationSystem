@@ -26,7 +26,7 @@ namespace TransportationBookingSystem.Models.ViewModels
         public List<SelectListItem> Roles { get; set; } = new List<SelectListItem>
         {
             new SelectListItem { Value = "User", Text = "User" },
-            new SelectListItem { Value = "Admin", Text = "Admin" }
+    
         };
     }
 

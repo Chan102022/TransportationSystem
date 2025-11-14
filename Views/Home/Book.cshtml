@@ -52,7 +52,7 @@
                 @foreach (var passenger in Model)
                 {
                     <tr style="background-color: #fdfdfd;">
-                    
+
                         <td style="border: 2px solid black; padding: 10px;">@passenger.BookingId</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.Name</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.Departure → @passenger.Arrival</td>
@@ -60,12 +60,23 @@
                         <td style="border: 2px solid black; padding: 10px;">@passenger.SeatNo</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.Status</td>
+
+                        <!-- UPDATED ACTION BUTTONS -->
                         <td style="border: 2px solid black; padding: 10px;">
-                            <a asp-action="Booking" asp-route-id="@passenger.BookingId"
-                               style="margin-right: 10px; color: blue; text-decoration: underline;">Edit</a>
-                            <a asp-action="DeleteBook" asp-route-id="@passenger.BookingId"
-                               style="color: red; text-decoration: underline;">Delete</a>
+                            @if (passenger.Status != "Confirmed")
+                            {
+                                <a asp-action="Booking" asp-route-id="@passenger.BookingId"
+                                   style="margin-right: 10px; color: blue; text-decoration: underline;">Edit</a>
+
+                                <a asp-action="DeleteBook" asp-route-id="@passenger.BookingId"
+                                   style="color: red; text-decoration: underline;">Delete</a>
+                            }
+                            else
+                            {
+                                <span style="color: gray; font-weight: bold;">Locked</span>
+                            }
                         </td>
+
                     </tr>
                 }
             </tbody>

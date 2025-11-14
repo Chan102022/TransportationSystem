@@ -91,6 +91,9 @@
             <input asp-for="SeatNo" type="hidden" />
             <input asp-for="BookingDate" type="hidden" />
             <input asp-for="UserId" type="hidden" />
+            <!-- Hidden Status Field -->
+            <input asp-for="Status" type="hidden" value="Pending" />
+
 
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Bus No</label>
@@ -161,18 +164,7 @@
                 </div>
             </div>
 
-            <div class="mb-4 row align-items-center">
-                <label asp-for="Status" class="col-sm-3 col-form-label"></label>
-                <div class="col-sm-9">
-                    <select asp-for="Status" class="form-select" required>
-                        <option value="" disabled selected hidden>Select Status</option>
-                        <option>Pending</option>
-                        <option>Confirmed</option>
-                        <option>Canceled</option>
-                    </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
-                </div>
-            </div>
+       
 
             <div class="text-center">
                 <button id="bookNowBtn" type="submit" class="btn btn-outline-dark px-5 py-2 fw-bold" style="border-width: 3px;">
