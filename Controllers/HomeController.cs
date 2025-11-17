@@ -28,12 +28,12 @@ namespace TransportationBookingSystem.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var destinations = await _context.Destinations.ToListAsync();
+            ViewBag.Destinations = destinations;
             return View();
         }
-
-       
 
         public async Task<IActionResult> Book()
         {
@@ -49,30 +49,43 @@ namespace TransportationBookingSystem.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
+            var destinations = await _context.Destinations.ToListAsync();
+            ViewBag.Destinations = destinations;
+
+            Passenger newPassenger = null;
+
             if (!string.IsNullOrEmpty(id))
             {
-                var passengerInDb = await _context.Book
-                    .FirstOrDefaultAsync(p => p.BookingId == id && p.UserId == userId);
+                var dest = await _context.Destinations.FindAsync(int.Parse(id));
+                if (dest == null) return NotFound();
 
-                if (passengerInDb == null)
+                newPassenger = new Passenger
                 {
-                    return NotFound();
-                }
-
-                return View(passengerInDb);
+                    BookingId = _passengersService.GenerateNextBookingId(),
+                    BusNo = _passengersService.GenerateNextBusNo(),
+                    SeatNo = _passengersService.GenerateNextSeatNo(),
+                    BookingDate = DateTime.Now,
+                    UserId = userId,
+                    Departure = dest.Name, // or Departure location
+                    Arrival = dest.Name // or Arrival location, if separate
+                };
             }
-
-            var newPassenger = new Passenger
+            else
             {
-                BookingId = _passengersService.GenerateNextBookingId(),
-                BusNo = _passengersService.GenerateNextBusNo(),
-                SeatNo = _passengersService.GenerateNextSeatNo(),
-                BookingDate = DateTime.Now,
-                UserId = userId
-            };
+                newPassenger = new Passenger
+                {
+                    BookingId = _passengersService.GenerateNextBookingId(),
+                    BusNo = _passengersService.GenerateNextBusNo(),
+                    SeatNo = _passengersService.GenerateNextSeatNo(),
+                    BookingDate = DateTime.Now,
+                    UserId = userId
+                };
+            }
 
             return View(newPassenger);
         }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -82,6 +95,8 @@ namespace TransportationBookingSystem.Controllers
 
             if (!ModelState.IsValid)
             {
+                // Reload destinations if form validation fails
+                ViewBag.Destinations = await _context.Destinations.ToListAsync();
                 return View("Booking", model);
             }
 
@@ -129,6 +144,7 @@ namespace TransportationBookingSystem.Controllers
             return RedirectToAction(nameof(Book));
         }
 
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -137,5 +153,27 @@ namespace TransportationBookingSystem.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
+        [HttpGet]
+       
+        public async Task<IActionResult> Destinations()
+        {
+            // Fetch all destinations from the database
+            var destinations = await _context.Destinations.ToListAsync();
+
+            // Pass the list to the view
+            return View("~/Views/Admin/Destinations.cshtml", destinations);
+        }
+        public async Task<IActionResult> AdminHome()
+        {
+            var destinations = await _context.Destinations.ToListAsync();
+            var bookings = await _context.Book.ToListAsync(); // or your booking DbSet
+
+            var model = new Tuple<List<Destination>, List<Passenger>>(destinations, bookings);
+
+            return View(model);
+        }
+
+
+
     }
 }

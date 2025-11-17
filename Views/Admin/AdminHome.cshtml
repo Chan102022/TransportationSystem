@@ -1,0 +1,97 @@
+﻿@model Tuple<List<TransportationBookingSystem.Models.Destination>, List<TransportationBookingSystem.Models.Passenger>>
+
+@{
+    ViewData["Title"] = "Admin Home";
+    var destinations = Model.Item1;
+    var bookings = Model.Item2;
+}
+
+<body style="background-color: pink; font-family: Arial, sans-serif; margin: 0; padding: 0;">
+
+    <div style="
+        border: 5px solid black;
+        background-color: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 40px auto;
+        width: 95%;
+        max-width: 1300px;
+        text-align: center;
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+    ">
+
+        <!-- Heading -->
+        <h1 style="
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            padding: 10px 30px;
+            display: inline-block;
+            border: 5px solid black;
+            border-radius: 20px;
+            background-color: pink;
+        ">
+            Admin Dashboard
+        </h1>
+
+        <!-- Available Routes -->
+        <div style="margin-bottom: 30px; text-align: left;">
+            <h4>Available Routes</h4>
+            <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                <thead style="background-color: pink; color: black;">
+                    <tr>
+                        <th style="border: 3px solid black; padding: 10px;">ID</th>
+                        <th style="border: 3px solid black; padding: 10px;">Route</th>
+                        <th style="border: 3px solid black; padding: 10px;">Fare</th>
+                        <th style="border: 3px solid black; padding: 10px;">Departure</th>
+                        <th style="border: 3px solid black; padding: 10px;">Arrival</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dest in destinations)
+                    {
+                        <tr style="background-color: #fdfdfd;">
+                            <td style="border: 2px solid black; padding: 10px;">@dest.Id</td>
+                            <td style="border: 2px solid black; padding: 10px;">@dest.Name</td>
+                            <td style="border: 2px solid black; padding: 10px;">@dest.Fare.ToString("F2")</td>
+                            <td style="border: 2px solid black; padding: 10px;">@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td style="border: 2px solid black; padding: 10px;">@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- All Bookings -->
+        <div style="margin-top: 40px; text-align: left;">
+            <h4>All Bookings</h4>
+            <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                <thead style="background-color: pink; color: black;">
+                    <tr>
+                        <th style="border: 3px solid black; padding: 10px;">Passenger Name</th>
+                        <th style="border: 3px solid black; padding: 10px;">Route</th>
+                        <th style="border: 3px solid black; padding: 10px;">Fare</th>
+                        <th style="border: 3px solid black; padding: 10px;">Bus No</th>
+                        <th style="border: 3px solid black; padding: 10px;">Seat No</th>
+                        <th style="border: 3px solid black; padding: 10px;">Booking Date</th>
+                        <th style="border: 3px solid black; padding: 10px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in bookings)
+                    {
+                        <tr style="background-color: #fdfdfd;">
+                            <td style="border: 2px solid black; padding: 10px;">@booking.Name</td>
+                            <td style="border: 2px solid black; padding: 10px;">@booking.Departure → @booking.Arrival</td>
+                            <td style="border: 2px solid black; padding: 10px;">@booking.Fare.ToString("F2")</td>
+                            <td style="border: 2px solid black; padding: 10px;">@booking.BusNo</td>
+                            <td style="border: 2px solid black; padding: 10px;">@booking.SeatNo</td>
+                            <td style="border: 2px solid black; padding: 10px;">@booking.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td style="border: 2px solid black; padding: 10px;">@booking.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>

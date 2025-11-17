@@ -1,0 +1,124 @@
+﻿@model List<TransportationBookingSystem.Models.Destination>
+
+@{
+    ViewData["Title"] = "Manage Destinations";
+}
+
+<body style="background-color: pink; font-family: Arial, sans-serif; margin: 0; padding: 0;">
+
+    <div style="
+        border: 5px solid black;
+        background-color: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 40px auto;
+        width: 95%;
+        max-width: 1300px;
+        text-align: center;
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+    ">
+
+        <!-- Heading -->
+        <h1 style="
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            padding: 10px 30px;
+            display: inline-block;
+            border: 5px solid black;
+            border-radius: 20px;
+            background-color: pink;
+        ">
+            Destination Management
+        </h1>
+
+        <!-- Add New Destination Form -->
+        <div style="margin-bottom: 30px; text-align: left;">
+            <h4>Add New Destination</h4>
+            <form asp-action="AddDestination" asp-controller="Admin" method="post" class="d-flex flex-wrap gap-2 align-items-end">
+                <input type="text" name="name" class="form-control" placeholder="Departure-Arrival" required />
+                <input type="number" name="fare" class="form-control" placeholder="Fare" step="0.01" required />
+
+                <div class="d-flex flex-column">
+                    <label for="departureTime" class="form-label small">Departure</label>
+                    <input type="datetime-local" id="departureTime" name="departureTime" class="form-control" required />
+                </div>
+
+                <div class="d-flex flex-column">
+                    <label for="arrivalTime" class="form-label small">Arrival</label>
+                    <input type="datetime-local" id="arrivalTime" name="arrivalTime" class="form-control" required />
+                </div>
+
+                <button type="submit" class="btn btn-sm btn-outline-dark">Add</button>
+            </form>
+        </div>
+
+        <!-- Destinations Table -->
+        <h4>All Destinations</h4>
+        <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+            <thead style="background-color: pink; color: black;">
+                <tr>
+                    <th style="border: 3px solid black; padding: 10px;">ID</th>
+                    <th style="border: 3px solid black; padding: 10px;">Name</th>
+                    <th style="border: 3px solid black; padding: 10px;">Fare</th>
+                    <th style="border: 3px solid black; padding: 10px;">Departure</th>
+                    <th style="border: 3px solid black; padding: 10px;">Arrival</th>
+                    <th style="border: 3px solid black; padding: 10px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dest in Model)
+                {
+                    <tr style="background-color: #fdfdfd;">
+                        <td style="border: 2px solid black; padding: 10px;">@dest.Id</td>
+                        <td style="border: 2px solid black; padding: 10px;">@dest.Name</td>
+                        <td style="border: 2px solid black; padding: 10px;">@dest.Fare.ToString("F2")</td>
+                        <td style="border: 2px solid black; padding: 10px;">@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td style="border: 2px solid black; padding: 10px;">@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td style="border: 2px solid black; padding: 10px;">
+                            <form asp-action="EditDestination" asp-controller="Admin" method="post" class="d-flex flex-wrap gap-2 align-items-end">
+                                <input type="hidden" name="id" value="@dest.Id" />
+                                <input type="text" name="name" value="@dest.Name" class="form-control form-control-sm" required />
+                                <input type="number" name="fare" value="@dest.Fare.ToString("F2")" class="form-control form-control-sm" step="0.01" required />
+                                <input type="datetime-local" name="departureTime"
+                                       value="@dest.DepartureTime.ToString("yyyy-MM-ddTHH:mm")" class="form-control form-control-sm" required />
+                                <input type="datetime-local" name="arrivalTime"
+                                       value="@dest.ArrivalTime.ToString("yyyy-MM-ddTHH:mm")" class="form-control form-control-sm" required />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+                                <a asp-action="DeleteDestination" asp-controller="Admin" asp-route-id="@dest.Id" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Are you sure you want to delete this destination?');">Delete</a>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<script>
+    // ADD form validation
+    const departureInput = document.getElementById("departureTime");
+    const arrivalInput = document.getElementById("arrivalTime");
+
+    departureInput.addEventListener("change", function () {
+        arrivalInput.min = this.value; // min date & time
+        if (arrivalInput.value && arrivalInput.value < this.value) {
+            arrivalInput.value = this.value;
+        }
+    });
+
+    // EDIT form validation for each row
+    document.querySelectorAll("form").forEach(form => {
+        const dep = form.querySelector("input[name='departureTime']");
+        const arr = form.querySelector("input[name='arrivalTime']");
+
+        if (dep && arr) {
+            dep.addEventListener("change", function () {
+                arr.min = dep.value; // restrict arrival date & time
+                if (arr.value && arr.value < dep.value) {
+                    arr.value = dep.value;
+                }
+            });
+        }
+    });
+</script>

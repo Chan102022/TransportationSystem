@@ -7,43 +7,11 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
-        const fareTable = {
-            "Manila-Cebu City": 1500,
-            "Cebu City-Manila": 1500,
-
-            "Manila-Davao City": 2800,
-            "Davao City-Manila": 2800,
-
-            "Manila-Baguio": 800,
-            "Baguio-Manila": 800,
-
-            "Manila-Tagaytay": 300,
-            "Tagaytay-Manila": 300,
-
-            "Cebu City-Davao City": 1600,
-            "Davao City-Cebu City": 1600,
-
-            "Cebu City-Baguio": 1800,
-            "Baguio-Cebu City": 1800,
-
-            "Cebu City-Tagaytay": 1400,
-            "Tagaytay-Cebu City": 1400,
-
-            "Davao City-Baguio": 2200,
-            "Baguio-Davao City": 2200,
-
-            "Davao City-Tagaytay": 2500,
-            "Tagaytay-Davao City": 2500,
-
-            "Baguio-Tagaytay": 900,
-            "Tagaytay-Baguio": 900
-        };
-
         const departureSelect = document.querySelector('select[name="Departure"]');
         const arrivalSelect = document.querySelector('select[name="Arrival"]');
         const fareDisplay = document.getElementById("fareDisplay");
 
-        function updateFare() {
+        async function updateFare() {
             const dep = departureSelect.value;
             const arr = arrivalSelect.value;
 
@@ -52,12 +20,19 @@
                 return;
             }
 
-            const key = `${dep}-${arr}`;
-            if (fareTable[key] !== undefined) {
-                fareDisplay.value = fareTable[key]; // Numeric value only
-            } else {
-                fareDisplay.value = "";
-                alert("Fare not available for selected route.");
+            try {
+                const response = await fetch(`/Home/GetFare?from=${dep}&to=${arr}`);
+                const data = await response.json();
+
+                if (data.fare !== null) {
+                    fareDisplay.value = data.fare;
+                } else {
+                    fareDisplay.value = "";
+                    alert("Fare not available for selected route.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error fetching fare.");
             }
         }
 
@@ -91,9 +66,7 @@
             <input asp-for="SeatNo" type="hidden" />
             <input asp-for="BookingDate" type="hidden" />
             <input asp-for="UserId" type="hidden" />
-            <!-- Hidden Status Field -->
             <input asp-for="Status" type="hidden" value="Pending" />
-
 
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Bus No</label>
@@ -130,11 +103,10 @@
                 <div class="col-sm-9">
                     <select asp-for="Departure" class="form-select" required>
                         <option value="" disabled selected hidden>Select Departure</option>
-                        <option>Manila</option>
-                        <option>Cebu City</option>
-                        <option>Davao City</option>
-                        <option>Baguio</option>
-                        <option>Tagaytay</option>
+                        @foreach (var dest in ViewBag.Destinations)
+                        {
+                            <option value="@dest.Name">@dest.Name</option>
+                        }
                     </select>
                     <span asp-validation-for="Departure" class="text-danger"></span>
                 </div>
@@ -146,11 +118,10 @@
                 <div class="col-sm-9">
                     <select asp-for="Arrival" class="form-select" required>
                         <option value="" disabled selected hidden>Select Arrival</option>
-                        <option>Manila</option>
-                        <option>Cebu City</option>
-                        <option>Davao City</option>
-                        <option>Baguio</option>
-                        <option>Tagaytay</option>
+                        @foreach (var dest in ViewBag.Destinations)
+                        {
+                            <option value="@dest.Name">@dest.Name</option>
+                        }
                     </select>
                     <span asp-validation-for="Arrival" class="text-danger"></span>
                 </div>
@@ -163,8 +134,6 @@
                     <input id="fareDisplay" class="form-control" type="number" asp-for="Fare" readonly placeholder="Select Departure and Arrival" />
                 </div>
             </div>
-
-       
 
             <div class="text-center">
                 <button id="bookNowBtn" type="submit" class="btn btn-outline-dark px-5 py-2 fw-bold" style="border-width: 3px;">

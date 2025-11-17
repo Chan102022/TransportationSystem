@@ -7,6 +7,8 @@ namespace TransportationBookingSystem.Models
     public class TransportationBookingSystemDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Passenger> Book { get; set; }
+        public DbSet<Destination> Destinations { get; set; }
+
 
         public TransportationBookingSystemDbContext(DbContextOptions<TransportationBookingSystemDbContext> options)
             : base(options)

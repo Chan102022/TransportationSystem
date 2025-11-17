@@ -1,21 +1,14 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using TransportationBookingSystem.Models
+﻿@using TransportationBookingSystem.Models
+@using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 
 @{
     ViewData["Title"] = "Home Page";
-    var isAdmin = false;
+    var isAdmin = User.IsInRole("Admin");
 
-    if (SignInManager.IsSignedIn(User))
-    {
-        var user = await UserManager.GetUserAsync(User);
-        if (user != null)
-        {
-            var roles = await UserManager.GetRolesAsync(user);
-            isAdmin = roles.Contains("Admin");
-        }
-    }
+    // Get destinations from ViewBag (passed from controller)
+    var destinations = ViewBag.Destinations as List<Destination> ?? new List<Destination>();
 }
 
 <body style="background-color: pink; font-family: Arial, sans-serif; margin: 0; padding: 0;">
@@ -25,72 +18,94 @@
         <h1 style="
             font-size: 3rem;
             display: inline-block;
-            padding: 10px 30px;
+            padding: 15px 40px;
             border: 5px solid black;
-            border-radius: 20px;
+            border-radius: 25px;
             background-color: white;
             color: black;
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
         ">
-            Book Now
+            Book Your Ride
         </h1>
     </div>
 
-    <!-- Main Section with Image and Buttons -->
-    <div style="
-        margin: 40px auto;
-        width: 95%;
-        max-width: 1300px;
-        height: 700px;
-        background-image: url('/image/bg.png');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        border: 5px solid black;
-        border-radius: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
-    ">
-        <div style="text-align: center;">
-            @if (isAdmin)
-            {
-                <!-- Admin View -->
+    <div class="container" style="max-width:1300px; margin: auto; padding: 20px;">
+
+        @if (isAdmin)
+        {
+            <!-- Admin View -->
+            <div style="text-align:center; margin-top:50px;">
                 <a asp-controller="Admin" asp-action="Dashboard"
-                   style="background-color: white; color: black; font-weight: bold;
-                              padding: 12px 25px; margin: 10px; border: 5px solid black;
-                              border-radius: 10px; text-decoration: none; transition: transform 0.3s ease;
-                              display: inline-block;"
-                   onmouseover="this.style.transform='scale(1.1)'"
-                   onmouseout="this.style.transform='scale(1)'">
+                   style="
+                           background-color: white;
+                           color: black;
+                           font-weight: bold;
+                           padding: 15px 30px;
+                           border: 5px solid black;
+                           border-radius: 15px;
+                           text-decoration: none;
+                           transition: all 0.3s ease;
+                           display: inline-block;
+                           box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+                       "
+                   onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='4px 4px 12px rgba(0,0,0,0.3)';"
+                   onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='2px 2px 8px rgba(0,0,0,0.2)';">
                     Admin Dashboard
                 </a>
-            }
-            else
-            {
-                <!-- Regular User View -->
-                <a asp-controller="Home" asp-action="Book"
-                   style="background-color: white; color: black; font-weight: bold;
-                              padding: 12px 25px; margin: 10px; border: 5px solid black;
-                              border-radius: 10px; text-decoration: none; transition: transform 0.3s ease;
-                              display: inline-block;"
-                   onmouseover="this.style.transform='scale(1.1)'"
-                   onmouseout="this.style.transform='scale(1)'">
-                    View Existing Bookings
-                </a>
+            </div>
+        }
+        else
+        {
+            <!-- Regular User View -->
+            <h2 style="text-align:center; margin-bottom:40px; color:black; text-decoration:underline;">
+                Available Destinations
+            </h2>
 
-                <a asp-controller="Home" asp-action="Booking"
-                   style="background-color: white; color: black; font-weight: bold;
-                              padding: 12px 25px; margin: 10px; border: 5px solid black;
-                              border-radius: 10px; text-decoration: none; transition: transform 0.3s ease;
-                              display: inline-block;"
-                   onmouseover="this.style.transform='scale(1.1)'"
-                   onmouseout="this.style.transform='scale(1)'">
-                    Book Now
-                </a>
-            }
-        </div>
+            <div style="display:flex; flex-wrap:wrap; gap:25px; justify-content:center;">
+
+                @foreach (var dest in destinations)
+                {
+                    <div style="
+                                background-color: white;
+                                border: 2px solid black;
+                                border-radius: 20px;
+                                padding: 25px;
+                                width: 260px;
+                                text-align: center;
+                                box-shadow: 3px 3px 12px rgba(0,0,0,0.2);
+                                transition: transform 0.3s, box-shadow 0.3s;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: space-between;
+                            "
+                         onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='5px 5px 15px rgba(0,0,0,0.3)';"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='3px 3px 12px rgba(0,0,0,0.2)';">
+                        <div>
+                            <h3 style="margin-bottom: 15px; color:#d63384;">@dest.Name</h3>
+                            <p style="margin:5px 0; font-weight:bold;">Fare: ₱@dest.Fare.ToString("F2")</p>
+                            <p style="margin:5px 0; font-size:0.9rem; color:#555;">Departure: @dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</p>
+                            <p style="margin:5px 0; font-size:0.9rem; color:#555;">Arrival: @dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</p>
+                        </div>
+
+                        <a asp-controller="Home" asp-action="Booking" asp-route-id="@dest.Id"
+                           style="
+                                       background-color: #d63384;
+                                       color: white;
+                                       font-weight: bold;
+                                       padding: 10px 15px;
+                                       border-radius: 12px;
+                                       text-decoration: none;
+                                       margin-top: 15px;
+                                       transition: background-color 0.3s, transform 0.3s;
+                                   "
+                           onmouseover="this.style.backgroundColor='#c12c73'; this.style.transform='scale(1.05)';"
+                           onmouseout="this.style.backgroundColor='#d63384'; this.style.transform='scale(1)';">
+                            Book Now
+                        </a>
+                    </div>
+                }
+            </div>
+        }
     </div>
 
 </body>

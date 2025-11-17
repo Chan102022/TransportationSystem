@@ -31,6 +31,34 @@
 
     <div class="card">
         <h4>All Bookings</h4>
+        <div class="card mb-3 p-3">
+            <h4>Filter Bookings</h4>
+            <form asp-action="Dashboard" asp-controller="Admin" method="get" class="d-flex gap-2 flex-wrap">
+                <div class="d-flex flex-column">
+                    <label>Status</label>
+                    <select name="statusFilter" class="form-select">
+                        <option value="">All</option>
+                        <option value="Pending" selected="@(ViewBag.StatusFilter == "Pending" ? "selected" : null)">Pending</option>
+                        <option value="Confirmed" selected="@(ViewBag.StatusFilter == "Confirmed" ? "selected" : null)">Confirmed</option>
+                        <option value="Canceled" selected="@(ViewBag.StatusFilter == "Canceled" ? "selected" : null)">Canceled</option>
+                    </select>
+                </div>
+
+                <div class="d-flex flex-column">
+                    <label>Destination</label>
+                    <select name="routeFilter" class="form-select">
+                        <option value="">All</option>
+                        @foreach (var route in ViewBag.Routes as List<string>)
+                        {
+                            <option value="@route" selected="@(ViewBag.RouteFilter == route ? "selected" : null)">@route</option>
+                        }
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-outline-dark align-self-end">Filter</button>
+            </form>
+        </div>
+
         <table class="table table-bordered mt-3">
             <thead class="table-dark">
                 <tr>

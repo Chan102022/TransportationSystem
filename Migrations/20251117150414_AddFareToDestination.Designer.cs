@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TransportationBookingSystem.Models;
 
@@ -11,9 +12,11 @@ using TransportationBookingSystem.Models;
 namespace TransportationBookingSystem.Migrations
 {
     [DbContext(typeof(TransportationBookingSystemDbContext))]
-    partial class TransportationBookingSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251117150414_AddFareToDestination")]
+    partial class AddFareToDestination
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,12 +228,6 @@ namespace TransportationBookingSystem.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ArrivalTime")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DepartureTime")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Fare")
                         .HasColumnType("decimal(65,30)");
