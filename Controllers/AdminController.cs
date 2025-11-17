@@ -18,7 +18,7 @@ namespace TransportationBookingSystem.Controllers
         // ---------------------
         // BOOKINGS
         // ---------------------
-        public async Task<IActionResult> Dashboard(string statusFilter, string routeFilter)
+        public async Task<IActionResult> Dashboard(string statusFilter, string destinationFilter)
         {
             var bookingsQuery = _context.Book.AsQueryable();
 
@@ -27,24 +27,23 @@ namespace TransportationBookingSystem.Controllers
                 bookingsQuery = bookingsQuery.Where(b => b.Status == statusFilter);
             }
 
-            if (!string.IsNullOrWhiteSpace(routeFilter))
+            if (!string.IsNullOrWhiteSpace(destinationFilter))
             {
-                bookingsQuery = bookingsQuery.Where(b => (b.Departure + "-" + b.Arrival) == routeFilter);
+                bookingsQuery = bookingsQuery.Where(b => b.Destination == destinationFilter);
             }
 
-            var bookings = await bookingsQuery.ToListAsync();
+            var bookings = await bookingsQuery.Include(b => b.User).ToListAsync();
 
             // Prepare list of distinct destinations for filter dropdown
-            ViewBag.Routes = await _context.Destinations
+            ViewBag.Destinations = await _context.Destinations
                 .Select(d => d.Name)
                 .ToListAsync();
 
             ViewBag.StatusFilter = statusFilter;
-            ViewBag.RouteFilter = routeFilter;
+            ViewBag.DestinationFilter = destinationFilter;
 
             return View(bookings);
         }
-
 
         public async Task<IActionResult> ViewAllBookings()
         {
@@ -125,10 +124,12 @@ namespace TransportationBookingSystem.Controllers
 
             return RedirectToAction("Destinations");
         }
+
+        // Admin Home (summary view)
         public async Task<IActionResult> AdminHome()
         {
             var destinations = await _context.Destinations.ToListAsync();
-            var bookings = await _context.Book.ToListAsync(); // or your booking DbSet
+            var bookings = await _context.Book.ToListAsync();
 
             var model = new Tuple<List<Destination>, List<Passenger>>(destinations, bookings);
 

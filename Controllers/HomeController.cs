@@ -49,76 +49,74 @@ namespace TransportationBookingSystem.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
+            // Load destinations for dropdown
             var destinations = await _context.Destinations.ToListAsync();
             ViewBag.Destinations = destinations;
 
-            Passenger newPassenger = null;
-
             if (!string.IsNullOrEmpty(id))
             {
-                var dest = await _context.Destinations.FindAsync(int.Parse(id));
-                if (dest == null) return NotFound();
+                var passengerInDb = await _context.Book
+                    .FirstOrDefaultAsync(p => p.BookingId == id && p.UserId == userId);
 
-                newPassenger = new Passenger
+                if (passengerInDb == null)
                 {
-                    BookingId = _passengersService.GenerateNextBookingId(),
-                    BusNo = _passengersService.GenerateNextBusNo(),
-                    SeatNo = _passengersService.GenerateNextSeatNo(),
-                    BookingDate = DateTime.Now,
-                    UserId = userId,
-                    Departure = dest.Name, // or Departure location
-                    Arrival = dest.Name // or Arrival location, if separate
-                };
+                    return NotFound();
+                }
+
+                return View(passengerInDb);
             }
-            else
+
+            // If no id, create a new Passenger
+            var newPassenger = new Passenger
             {
-                newPassenger = new Passenger
-                {
-                    BookingId = _passengersService.GenerateNextBookingId(),
-                    BusNo = _passengersService.GenerateNextBusNo(),
-                    SeatNo = _passengersService.GenerateNextSeatNo(),
-                    BookingDate = DateTime.Now,
-                    UserId = userId
-                };
-            }
+                BookingId = _passengersService.GenerateNextBookingId(),
+                BusNo = _passengersService.GenerateNextBusNo(),
+                SeatNo = _passengersService.GenerateNextSeatNo(),
+                BookingDate = DateTime.Now,
+                UserId = userId
+            };
 
             return View(newPassenger);
         }
-
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> BookingForm(Passenger model)
         {
-            model.User = null;
+            // Fill required fields
+            model.BookingId ??= _passengersService.GenerateNextBookingId();
+            model.BusNo ??= _passengersService.GenerateNextBusNo();
+            model.SeatNo ??= _passengersService.GenerateNextSeatNo();
+            model.BookingDate = DateTime.Now;
+            model.UserId ??= _userManager.GetUserId(User);
+            model.Status ??= "Pending";
+
+            // Lookup selected destination to set Fare only
+            var selectedDestination = await _context.Destinations
+                .FirstOrDefaultAsync(d => d.Name == model.Destination);
+
+            if (selectedDestination != null)
+            {
+                model.Fare = selectedDestination.Fare;
+            }
 
             if (!ModelState.IsValid)
             {
-                // Reload destinations if form validation fails
                 ViewBag.Destinations = await _context.Destinations.ToListAsync();
                 return View("Booking", model);
             }
 
-            var userId = _userManager.GetUserId(User);
-
+            // Save to database
             var existingPassenger = await _context.Book
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.BookingId == model.BookingId && p.UserId == userId);
+                .FirstOrDefaultAsync(p => p.BookingId == model.BookingId && p.UserId == model.UserId);
 
             if (existingPassenger == null)
             {
-                model.BookingId = _passengersService.GenerateNextBookingId();
-                model.BusNo = _passengersService.GenerateNextBusNo();
-                model.SeatNo = _passengersService.GenerateNextSeatNo();
-                model.BookingDate = DateTime.Now;
-                model.UserId = userId;
-
                 await _context.Book.AddAsync(model);
             }
             else
             {
-                model.UserId = userId;
                 _context.Book.Update(model);
             }
 
@@ -144,7 +142,6 @@ namespace TransportationBookingSystem.Controllers
             return RedirectToAction(nameof(Book));
         }
 
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -153,27 +150,24 @@ namespace TransportationBookingSystem.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
+
         [HttpGet]
-       
         public async Task<IActionResult> Destinations()
         {
             // Fetch all destinations from the database
             var destinations = await _context.Destinations.ToListAsync();
 
-            // Pass the list to the view
             return View("~/Views/Admin/Destinations.cshtml", destinations);
         }
+
         public async Task<IActionResult> AdminHome()
         {
             var destinations = await _context.Destinations.ToListAsync();
-            var bookings = await _context.Book.ToListAsync(); // or your booking DbSet
+            var bookings = await _context.Book.ToListAsync();
 
             var model = new Tuple<List<Destination>, List<Passenger>>(destinations, bookings);
 
             return View(model);
         }
-
-
-
     }
 }

@@ -12,8 +12,8 @@ using TransportationBookingSystem.Models;
 namespace TransportationBookingSystem.Migrations
 {
     [DbContext(typeof(TransportationBookingSystemDbContext))]
-    [Migration("20251117150414_AddFareToDestination")]
-    partial class AddFareToDestination
+    [Migration("20251117181448_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,6 +229,12 @@ namespace TransportationBookingSystem.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("ArrivalTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DepartureTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<decimal>("Fare")
                         .HasColumnType("decimal(65,30)");
 
@@ -246,10 +252,6 @@ namespace TransportationBookingSystem.Migrations
                     b.Property<string>("BookingId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Arrival")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime(6)");
 
@@ -257,7 +259,7 @@ namespace TransportationBookingSystem.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Departure")
+                    b.Property<string>("Destination")
                         .IsRequired()
                         .HasColumnType("longtext");
 

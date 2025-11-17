@@ -1,56 +1,8 @@
 ﻿@model TransportationBookingSystem.Models.Passenger
 @{
     ViewData["Title"] = "Booking";
+    var destinations = ViewBag.Destinations as List<TransportationBookingSystem.Models.Destination> ?? new List<TransportationBookingSystem.Models.Destination>();
 }
-
-@section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-
-    <script>
-        const departureSelect = document.querySelector('select[name="Departure"]');
-        const arrivalSelect = document.querySelector('select[name="Arrival"]');
-        const fareDisplay = document.getElementById("fareDisplay");
-
-        async function updateFare() {
-            const dep = departureSelect.value;
-            const arr = arrivalSelect.value;
-
-            if (!dep || !arr || dep === arr) {
-                fareDisplay.value = "";
-                return;
-            }
-
-            try {
-                const response = await fetch(`/Home/GetFare?from=${dep}&to=${arr}`);
-                const data = await response.json();
-
-                if (data.fare !== null) {
-                    fareDisplay.value = data.fare;
-                } else {
-                    fareDisplay.value = "";
-                    alert("Fare not available for selected route.");
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Error fetching fare.");
-            }
-        }
-
-        departureSelect.addEventListener("change", updateFare);
-        arrivalSelect.addEventListener("change", updateFare);
-    </script>
-}
-
-<style>
-    #bookNowBtn {
-        transition: transform 0.3s ease;
-    }
-
-        #bookNowBtn:hover {
-            transform: scale(1.25);
-            cursor: pointer;
-        }
-</style>
 
 <body style="background-color: pink;">
     <div class="container" style="max-width: 800px; margin-top: 40px; border: 5px solid black; padding: 30px; border-radius: 20px; background-color: white;">
@@ -60,14 +12,16 @@
             @Html.AntiForgeryToken()
 
             <div asp-validation-summary="All" class="text-danger"></div>
+            <!-- Hidden / readonly fields -->
+            <input type="hidden" name="BookingId" value="@Model.BookingId" />
+            <input type="hidden" name="BusNo" value="@Model.BusNo" />
+            <input type="hidden" name="SeatNo" value="@Model.SeatNo" />
+            <input type="hidden" name="BookingDate" value="@Model.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")" />
+            <input type="hidden" name="UserId" value="@Model.UserId" />
+            <input type="hidden" name="Status" value="@Model.Status ?? " Pending"" />
 
-            <input asp-for="BookingId" type="hidden" />
-            <input asp-for="BusNo" type="hidden" />
-            <input asp-for="SeatNo" type="hidden" />
-            <input asp-for="BookingDate" type="hidden" />
-            <input asp-for="UserId" type="hidden" />
-            <input asp-for="Status" type="hidden" value="Pending" />
 
+            <!-- Hidden/readonly fields visible -->
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Bus No</label>
                 <div class="col-sm-9">
@@ -89,6 +43,7 @@
                 </div>
             </div>
 
+            <!-- Passenger Name -->
             <div class="mb-3 row align-items-center">
                 <label asp-for="Name" class="col-sm-3 col-form-label"></label>
                 <div class="col-sm-9">
@@ -97,49 +52,53 @@
                 </div>
             </div>
 
-            <!-- Departure -->
+            <!-- Destination Dropdown (from homepage info) -->
             <div class="mb-3 row align-items-center">
-                <label asp-for="Departure" class="col-sm-3 col-form-label"></label>
+                <label class="col-sm-3 col-form-label">Destination</label>
                 <div class="col-sm-9">
-                    <select asp-for="Departure" class="form-select" required>
-                        <option value="" disabled selected hidden>Select Departure</option>
-                        @foreach (var dest in ViewBag.Destinations)
+                    <select id="destinationSelect" class="form-select" name="Destination" required>
+                        <option value="" disabled selected hidden>Select Destination</option>
+                        @foreach (var dest in destinations)
                         {
-                            <option value="@dest.Name">@dest.Name</option>
+                            <option value="@dest.Name"
+                                    data-fare="@dest.Fare"
+                                    data-departure="@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")"
+                                    data-arrival="@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")">
+                                @dest.Name | Fare: ₱@dest.Fare.ToString("F2") | Departure: @dest.DepartureTime.ToString("yyyy-MM-dd HH:mm") | Arrival: @dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")
+                            </option>
                         }
                     </select>
-                    <span asp-validation-for="Departure" class="text-danger"></span>
-                </div>
-            </div>
-
-            <!-- Arrival -->
-            <div class="mb-3 row align-items-center">
-                <label asp-for="Arrival" class="col-sm-3 col-form-label"></label>
-                <div class="col-sm-9">
-                    <select asp-for="Arrival" class="form-select" required>
-                        <option value="" disabled selected hidden>Select Arrival</option>
-                        @foreach (var dest in ViewBag.Destinations)
-                        {
-                            <option value="@dest.Name">@dest.Name</option>
-                        }
-                    </select>
-                    <span asp-validation-for="Arrival" class="text-danger"></span>
                 </div>
             </div>
 
             <!-- Fare Display -->
             <div class="mb-3 row align-items-center">
-                <label class="col-sm-3 col-form-label">Estimated Fare</label>
+                <label class="col-sm-3 col-form-label">Fare</label>
                 <div class="col-sm-9">
-                    <input id="fareDisplay" class="form-control" type="number" asp-for="Fare" readonly placeholder="Select Departure and Arrival" />
+                    <input id="fareDisplay" class="form-control" type="text" name="Fare" readonly placeholder="Select a destination" />
                 </div>
             </div>
 
             <div class="text-center">
-                <button id="bookNowBtn" type="submit" class="btn btn-outline-dark px-5 py-2 fw-bold" style="border-width: 3px;">
+                <button type="submit" class="btn btn-outline-dark px-5 py-2 fw-bold" style="border-width: 3px;">
                     Book Now
                 </button>
             </div>
         </form>
     </div>
+
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+        <script>
+            const destinationSelect = document.getElementById("destinationSelect");
+            const fareDisplay = document.getElementById("fareDisplay");
+
+            destinationSelect.addEventListener("change", function () {
+                const selectedOption = this.selectedOptions[0];
+                const fare = selectedOption.dataset.fare;
+
+                fareDisplay.value = fare ? parseFloat(fare).toFixed(2) : '';
+            });
+        </script>
+    }
 </body>

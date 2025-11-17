@@ -40,7 +40,8 @@
                 <tr style="background-color: pink; color: black;">
                     <th style="border: 3px solid black; padding: 10px;">Booking Id No.</th>
                     <th style="border: 3px solid black; padding: 10px;">Passenger Name</th>
-                    <th style="border: 3px solid black; padding: 10px;">Route</th>
+                    <th style="border: 3px solid black; padding: 10px;">Destination</th>
+                    <th style="border: 3px solid black; padding: 10px;">Fare</th>
                     <th style="border: 3px solid black; padding: 10px;">Bus No</th>
                     <th style="border: 3px solid black; padding: 10px;">Seat No.</th>
                     <th style="border: 3px solid black; padding: 10px;">Booking Date</th>
@@ -52,16 +53,26 @@
                 @foreach (var passenger in Model)
                 {
                     <tr style="background-color: #fdfdfd;">
-
                         <td style="border: 2px solid black; padding: 10px;">@passenger.BookingId</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.Name</td>
-                        <td style="border: 2px solid black; padding: 10px;">@passenger.Departure → @passenger.Arrival</td>
+
+                        <!-- Destination with Departure & Arrival -->
+                        <td style="border: 2px solid black; padding: 10px; text-align: left;">
+                            <strong>@passenger.Destination</strong> <br />
+                        
+                        </td>
+
+                        <!-- Fare -->
+                        <td style="border: 2px solid black; padding: 10px;">
+                            ₱@passenger.Fare.ToString("F2")
+                        </td>
+
                         <td style="border: 2px solid black; padding: 10px;">@passenger.BusNo</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.SeatNo</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.Status</td>
 
-                        <!-- UPDATED ACTION BUTTONS -->
+                        <!-- Actions -->
                         <td style="border: 2px solid black; padding: 10px;">
                             @if (passenger.Status != "Confirmed")
                             {
@@ -76,7 +87,6 @@
                                 <span style="color: gray; font-weight: bold;">Locked</span>
                             }
                         </td>
-
                     </tr>
                 }
             </tbody>

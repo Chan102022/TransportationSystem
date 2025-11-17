@@ -13,10 +13,7 @@ namespace TransportationBookingSystem.Models
         public string? Name { get; set; }
 
         [Required]
-        public string? Departure { get; set; }
-
-        [Required]
-        public string? Arrival { get; set; }
+        public string Destination { get; set; }
 
         [Required]
         public string? BusNo { get; set; }

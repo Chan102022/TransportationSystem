@@ -249,10 +249,6 @@ namespace TransportationBookingSystem.Migrations
                     b.Property<string>("BookingId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Arrival")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime(6)");
 
@@ -260,7 +256,7 @@ namespace TransportationBookingSystem.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Departure")
+                    b.Property<string>("Destination")
                         .IsRequired()
                         .HasColumnType("longtext");
 

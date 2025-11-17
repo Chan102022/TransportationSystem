@@ -87,21 +87,6 @@
                             <p style="margin:5px 0; font-size:0.9rem; color:#555;">Arrival: @dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</p>
                         </div>
 
-                        <a asp-controller="Home" asp-action="Booking" asp-route-id="@dest.Id"
-                           style="
-                                       background-color: #d63384;
-                                       color: white;
-                                       font-weight: bold;
-                                       padding: 10px 15px;
-                                       border-radius: 12px;
-                                       text-decoration: none;
-                                       margin-top: 15px;
-                                       transition: background-color 0.3s, transform 0.3s;
-                                   "
-                           onmouseover="this.style.backgroundColor='#c12c73'; this.style.transform='scale(1.05)';"
-                           onmouseout="this.style.backgroundColor='#d63384'; this.style.transform='scale(1)';">
-                            Book Now
-                        </a>
                     </div>
                 }
             </div>

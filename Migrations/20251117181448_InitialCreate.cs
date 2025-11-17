@@ -70,6 +70,24 @@ namespace TransportationBookingSystem.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Destinations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Fare = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    DepartureTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ArrivalTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Destinations", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -204,9 +222,7 @@ namespace TransportationBookingSystem.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Departure = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Arrival = table.Column<string>(type: "longtext", nullable: false)
+                    Destination = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BusNo = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -294,6 +310,9 @@ namespace TransportationBookingSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "Book");
+
+            migrationBuilder.DropTable(
+                name: "Destinations");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
