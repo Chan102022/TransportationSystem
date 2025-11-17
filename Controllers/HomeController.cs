@@ -66,6 +66,7 @@ namespace TransportationBookingSystem.Controllers
                 return View(passengerInDb);
             }
 
+
             // If no id, create a new Passenger
             var newPassenger = new Passenger
             {
@@ -81,6 +82,7 @@ namespace TransportationBookingSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        
         public async Task<IActionResult> BookingForm(Passenger model)
         {
             // Fill required fields
@@ -91,13 +93,15 @@ namespace TransportationBookingSystem.Controllers
             model.UserId ??= _userManager.GetUserId(User);
             model.Status ??= "Pending";
 
-            // Lookup selected destination to set Fare only
+            // Lookup selected destination to set Fare, DepartureTime, ArrivalTime
             var selectedDestination = await _context.Destinations
                 .FirstOrDefaultAsync(d => d.Name == model.Destination);
 
             if (selectedDestination != null)
             {
                 model.Fare = selectedDestination.Fare;
+                model.DepartureTime = selectedDestination.DepartureTime;
+                model.ArrivalTime = selectedDestination.ArrivalTime;
             }
 
             if (!ModelState.IsValid)
@@ -123,6 +127,7 @@ namespace TransportationBookingSystem.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Book));
         }
+
 
         public async Task<IActionResult> DeleteBook(string id)
         {

@@ -56,10 +56,11 @@
                         <td style="border: 2px solid black; padding: 10px;">@passenger.BookingId</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.Name</td>
 
-                        <!-- Destination with Departure & Arrival -->
+                        <!-- Destination + Departure + Arrival -->
                         <td style="border: 2px solid black; padding: 10px; text-align: left;">
                             <strong>@passenger.Destination</strong> <br />
-                        
+                            <span><strong>Departure:</strong> @passenger.DepartureTime</span><br />
+                            <span><strong>Arrival:</strong> @passenger.ArrivalTime</span>
                         </td>
 
                         <!-- Fare -->
@@ -69,7 +70,11 @@
 
                         <td style="border: 2px solid black; padding: 10px;">@passenger.BusNo</td>
                         <td style="border: 2px solid black; padding: 10px;">@passenger.SeatNo</td>
-                        <td style="border: 2px solid black; padding: 10px;">@passenger.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+
+                        <td style="border: 2px solid black; padding: 10px;">
+                            @passenger.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")
+                        </td>
+
                         <td style="border: 2px solid black; padding: 10px;">@passenger.Status</td>
 
                         <!-- Actions -->

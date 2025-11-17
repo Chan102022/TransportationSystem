@@ -71,6 +71,22 @@
                 </div>
             </div>
 
+            <!-- Departure Time Display -->
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label">Departure Time</label>
+                <div class="col-sm-9">
+                    <input id="departureDisplay" class="form-control" type="text" name="DepartureTime" readonly placeholder="Select a destination" />
+                </div>
+            </div>
+
+            <!-- Arrival Time Display -->
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label">Arrival Time</label>
+                <div class="col-sm-9">
+                    <input id="arrivalDisplay" class="form-control" type="text" name="ArrivalTime" readonly placeholder="Select a destination" />
+                </div>
+            </div>
+
             <!-- Fare Display -->
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Fare</label>
@@ -90,15 +106,28 @@
     @section Scripts {
         @await Html.PartialAsync("_ValidationScriptsPartial")
         <script>
-            const destinationSelect = document.getElementById("destinationSelect");
+                       const destinationSelect = document.getElementById("destinationSelect");
             const fareDisplay = document.getElementById("fareDisplay");
+            const departureDisplay = document.getElementById("departureDisplay");
+            const arrivalDisplay = document.getElementById("arrivalDisplay");
 
             destinationSelect.addEventListener("change", function () {
                 const selectedOption = this.selectedOptions[0];
-                const fare = selectedOption.dataset.fare;
 
+                // Set fare
+                const fare = selectedOption.dataset.fare;
                 fareDisplay.value = fare ? parseFloat(fare).toFixed(2) : '';
+
+                // Set departure
+                const departure = selectedOption.dataset.departure;
+                departureDisplay.value = departure || '';
+
+                // Set arrival
+                const arrival = selectedOption.dataset.arrival;
+                arrivalDisplay.value = arrival || '';
             });
+
+
         </script>
     }
 </body>

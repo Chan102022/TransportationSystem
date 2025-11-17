@@ -31,6 +31,7 @@
 
     <div class="card">
         <h4>All Bookings</h4>
+
         <div class="card mb-3 p-3">
             <h4>Filter Bookings</h4>
             <form asp-action="Dashboard" asp-controller="Admin" method="get" class="d-flex gap-2 flex-wrap">
@@ -52,7 +53,6 @@
                         {
                             <option value="@route" selected="@(ViewBag.RouteFilter == route ? "selected" : null)">@route</option>
                         }
-
                     </select>
                 </div>
 
@@ -65,6 +65,11 @@
                 <tr>
                     <th>Passenger Name</th>
                     <th>Route</th>
+
+                    <!-- Added columns -->
+                    <th>Departure Time</th>
+                    <th>Arrival Time</th>
+
                     <th>Fare (₱)</th>
                     <th>Bus No</th>
                     <th>Seat No</th>
@@ -73,25 +78,34 @@
                     <th>Update Status</th>
                 </tr>
             </thead>
+
             <tbody>
-                @foreach (var booking in Model )
+                @foreach (var booking in Model)
                 {
                     <tr>
                         <td>@booking.Name</td>
                         <td>@booking.Destination</td>
+
+                        <!-- NEW TIME DISPLAY -->
+                        <td>@booking.DepartureTime</td>
+                        <td>@booking.ArrivalTime</td>
+
                         <td>@booking.Fare.ToString("N2")</td>
                         <td>@booking.BusNo</td>
                         <td>@booking.SeatNo</td>
                         <td>@booking.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
                         <td>@booking.Status</td>
+
                         <td>
                             <form asp-action="UpdateStatus" asp-controller="Admin" method="post" class="d-flex">
                                 <input type="hidden" name="BookingId" value="@booking.BookingId" />
+
                                 <select name="Status" class="form-select me-2">
-                                    <option value="Pending" selected="@((booking.Status == "Pending") ? "selected" : null)">Pending</option>
-                                    <option value="Confirmed" selected="@((booking.Status == "Confirmed") ? "selected" : null)">Confirmed</option>
-                                    <option value="Canceled" selected="@((booking.Status == "Canceled") ? "selected" : null)">Canceled</option>
+                                    <option value="Pending" selected="@(booking.Status == "Pending")">Pending</option>
+                                    <option value="Confirmed" selected="@(booking.Status == "Confirmed")">Confirmed</option>
+                                    <option value="Canceled" selected="@(booking.Status == "Canceled")">Canceled</option>
                                 </select>
+
                                 <button type="submit" class="btn btn-sm btn-outline-dark">Update</button>
                             </form>
                         </td>

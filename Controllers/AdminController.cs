@@ -16,31 +16,32 @@ namespace TransportationBookingSystem.Controllers
         }
 
         // ---------------------
-        // BOOKINGS
+        // BOOKINGS DASHBOARD
         // ---------------------
-        public async Task<IActionResult> Dashboard(string statusFilter, string destinationFilter)
+        public async Task<IActionResult> Dashboard(string statusFilter, string routeFilter)
         {
+            // Start with all bookings
             var bookingsQuery = _context.Book.AsQueryable();
 
+            // Filter by status
             if (!string.IsNullOrWhiteSpace(statusFilter))
-            {
                 bookingsQuery = bookingsQuery.Where(b => b.Status == statusFilter);
-            }
 
-            if (!string.IsNullOrWhiteSpace(destinationFilter))
-            {
-                bookingsQuery = bookingsQuery.Where(b => b.Destination == destinationFilter);
-            }
+            // Filter by destination/route
+            if (!string.IsNullOrWhiteSpace(routeFilter))
+                bookingsQuery = bookingsQuery.Where(b => b.Destination == routeFilter);
 
-            var bookings = await bookingsQuery.Include(b => b.User).ToListAsync();
+            var bookings = await bookingsQuery
+                .Include(b => b.User)
+                .ToListAsync();
 
-            // Prepare list of distinct destinations for filter dropdown
-            ViewBag.Destinations = await _context.Destinations
+            // Prepare list of distinct routes for dropdown
+            ViewBag.Routes = await _context.Destinations
                 .Select(d => d.Name)
                 .ToListAsync();
 
             ViewBag.StatusFilter = statusFilter;
-            ViewBag.DestinationFilter = destinationFilter;
+            ViewBag.RouteFilter = routeFilter;
 
             return View(bookings);
         }
@@ -125,7 +126,9 @@ namespace TransportationBookingSystem.Controllers
             return RedirectToAction("Destinations");
         }
 
-        // Admin Home (summary view)
+        // ---------------------
+        // ADMIN HOME SUMMARY
+        // ---------------------
         public async Task<IActionResult> AdminHome()
         {
             var destinations = await _context.Destinations.ToListAsync();

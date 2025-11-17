@@ -36,5 +36,8 @@ namespace TransportationBookingSystem.Models
         [Required]
         [Column(TypeName = "decimal(10,2)")]
         public decimal Fare { get; set; }
+        public DateTime DepartureTime { get; set; }
+        public DateTime ArrivalTime { get; set; }
+
     }
 }
