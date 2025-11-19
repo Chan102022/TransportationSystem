@@ -31,6 +31,7 @@ namespace TransportationBookingSystem.Controllers
             _userManager = userManager;
         }
 
+        // HOME PAGE
         public async Task<IActionResult> Index()
         {
             var destinations = await _context.Destinations.ToListAsync();
@@ -38,6 +39,7 @@ namespace TransportationBookingSystem.Controllers
             return View();
         }
 
+        // USER BOOKINGS
         public async Task<IActionResult> Book()
         {
             var userId = _userManager.GetUserId(User);
@@ -48,30 +50,56 @@ namespace TransportationBookingSystem.Controllers
             return View(bookings);
         }
 
+        // BOOKING PAGE (CREATES or EDITS BOOKING)
         public async Task<IActionResult> Booking(string? id)
         {
             var userId = _userManager.GetUserId(User);
 
-            // Load destinations for dropdown
             var destinations = await _context.Destinations.ToListAsync();
             ViewBag.Destinations = destinations;
 
+            // ============================
+            // 1️⃣ USER CLICKED A DESTINATION CARD
+            // ============================
             if (!string.IsNullOrEmpty(id))
             {
+                var selectedDestination = await _context.Destinations
+                    .FirstOrDefaultAsync(d => d.Name == id);
+
+                if (selectedDestination != null)
+                {
+                    var newPassenger = new Passenger
+                    {
+                        BookingId = _passengersService.GenerateNextBookingId(),
+                        BusNo = _passengersService.GenerateNextBusNo(),
+                        SeatNo = _passengersService.GenerateNextSeatNo(),
+                        BookingDate = DateTime.Now,
+                        UserId = userId,
+
+                        // Auto-fill details from clicked card
+                        Destination = selectedDestination.Name,
+                        Fare = selectedDestination.Fare,
+                        DepartureTime = selectedDestination.DepartureTime,
+                        ArrivalTime = selectedDestination.ArrivalTime
+                    };
+
+                    return View(newPassenger);
+                }
+
+                // ============================
+                // 2️⃣ USER IS EDITING AN EXISTING BOOKING
+                // ============================
                 var passengerInDb = await _context.Book
                     .FirstOrDefaultAsync(p => p.BookingId == id && p.UserId == userId);
 
-                if (passengerInDb == null)
-                {
-                    return NotFound();
-                }
+                if (passengerInDb != null)
+                    return View(passengerInDb);
 
-                return View(passengerInDb);
+                return NotFound();
             }
 
-
-            // If no id, create a new Passenger
-            var newPassenger = new Passenger
+            // Default new booking
+            var blankPassenger = new Passenger
             {
                 BookingId = _passengersService.GenerateNextBookingId(),
                 BusNo = _passengersService.GenerateNextBusNo(),
@@ -80,14 +108,27 @@ namespace TransportationBookingSystem.Controllers
                 UserId = userId
             };
 
-            return View(newPassenger);
+            return View(blankPassenger);
         }
 
+        // SAVE BOOKING
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> BookingForm(Passenger model)
-        {
-            // Fill required fields
+        {// 🚫 Prevent duplicate booking for same user / same destination / same name
+            var duplicate = await _context.Book
+                .AnyAsync(b => b.UserId == model.UserId
+                            && b.Destination == model.Destination
+                            && b.Name == model.Name
+                            && b.Status != "Canceled"); // You can edit this rule
+
+            if (duplicate)
+            {
+                ModelState.AddModelError("", "You already have a booking for this destination.");
+                ViewBag.Destinations = await _context.Destinations.ToListAsync();
+                return View("Booking", model);
+            }
+
             model.BookingId ??= _passengersService.GenerateNextBookingId();
             model.BusNo ??= _passengersService.GenerateNextBusNo();
             model.SeatNo ??= _passengersService.GenerateNextSeatNo();
@@ -95,15 +136,13 @@ namespace TransportationBookingSystem.Controllers
             model.UserId ??= _userManager.GetUserId(User);
             model.Status ??= "Pending";
 
-            // Lookup selected destination
-            var selectedDestination = await _context.Destinations
-                .FirstOrDefaultAsync(d => d.Name == model.Destination);
-
-            if (selectedDestination != null)
+            // Fill destination data
+            var dest = await _context.Destinations.FirstOrDefaultAsync(d => d.Name == model.Destination);
+            if (dest != null)
             {
-                model.Fare = selectedDestination.Fare;
-                model.DepartureTime = selectedDestination.DepartureTime;
-                model.ArrivalTime = selectedDestination.ArrivalTime;
+                model.Fare = dest.Fare;
+                model.DepartureTime = dest.DepartureTime;
+                model.ArrivalTime = dest.ArrivalTime;
             }
 
             if (!ModelState.IsValid)
@@ -112,19 +151,17 @@ namespace TransportationBookingSystem.Controllers
                 return View("Booking", model);
             }
 
-            // Check if booking already exists
-            var existingPassenger = await _context.Book
+            var exists = await _context.Book
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.BookingId == model.BookingId
-                                       && p.UserId == model.UserId);
+                .FirstOrDefaultAsync(p => p.BookingId == model.BookingId);
 
-            if (existingPassenger == null)
+            // NEW BOOKING
+            if (exists == null)
             {
-                // ✔ FIXED: Create correct verify URL
-                var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                model.QRCodeImage = GenerateQrCodeBase64(model.BookingId);
+                string baseUrl = $"{Request.Scheme}://{Request.Host}";
+                string verifyUrl = $"{baseUrl}/Conductor/Verify?id={model.BookingId}";
 
-
+                model.QRCodeImage = GenerateQrCodeBase64(verifyUrl);
                 model.PaymentStatus = "Unpaid";
                 model.DatePaid = null;
 
@@ -137,12 +174,10 @@ namespace TransportationBookingSystem.Controllers
 
             await _context.SaveChangesAsync();
 
-            // Redirect to receipt
-            return RedirectToAction("Receipt", "Home", new { id = model.BookingId });
+            return RedirectToAction("Receipt", new { id = model.BookingId });
         }
 
-
-
+        // DELETE BOOKING
         public async Task<IActionResult> DeleteBook(string id)
         {
             var userId = _userManager.GetUserId(User);
@@ -151,9 +186,7 @@ namespace TransportationBookingSystem.Controllers
                 .FirstOrDefaultAsync(p => p.BookingId == id && p.UserId == userId);
 
             if (passengerInDb == null)
-            {
                 return NotFound();
-            }
 
             _context.Book.Remove(passengerInDb);
             await _context.SaveChangesAsync();
@@ -161,33 +194,7 @@ namespace TransportationBookingSystem.Controllers
             return RedirectToAction(nameof(Book));
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel
-            {
-                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Destinations()
-        {
-            // Fetch all destinations from the database
-            var destinations = await _context.Destinations.ToListAsync();
-
-            return View("~/Views/Admin/Destinations.cshtml", destinations);
-        }
-
-        public async Task<IActionResult> AdminHome()
-        {
-            var destinations = await _context.Destinations.ToListAsync();
-            var bookings = await _context.Book.ToListAsync();
-
-            var model = new Tuple<List<Destination>, List<Passenger>>(destinations, bookings);
-
-            return View(model);
-        }
+        // QR GENERATION
         private string GenerateQrCodeBase64(string text)
         {
             using (var qrGenerator = new QRCodeGenerator())
@@ -200,6 +207,8 @@ namespace TransportationBookingSystem.Controllers
                 return "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
             }
         }
+
+        // RECEIPT PAGE
         public async Task<IActionResult> Receipt(string id)
         {
             var userId = _userManager.GetUserId(User);
@@ -212,8 +221,5 @@ namespace TransportationBookingSystem.Controllers
 
             return View(booking);
         }
-
-
-
     }
 }

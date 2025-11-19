@@ -65,30 +65,33 @@
 
                 @foreach (var dest in destinations)
                 {
-                    <div style="
-                                background-color: white;
-                                border: 2px solid black;
-                                border-radius: 20px;
-                                padding: 25px;
-                                width: 260px;
-                                text-align: center;
-                                box-shadow: 3px 3px 12px rgba(0,0,0,0.2);
-                                transition: transform 0.3s, box-shadow 0.3s;
-                                display: flex;
-                                flex-direction: column;
-                                justify-content: space-between;
-                            "
-                         onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='5px 5px 15px rgba(0,0,0,0.3)';"
-                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='3px 3px 12px rgba(0,0,0,0.2)';">
-                        <div>
+                    <a asp-controller="Home" asp-action="Booking" asp-route-id="@dest.Name"
+                       style="text-decoration:none; color:inherit;">
+                        <div style="
+                        background-color: white;
+                        border: 2px solid black;
+                        border-radius: 20px;
+                        padding: 25px;
+                        width: 260px;
+                        text-align: center;
+                        box-shadow: 3px 3px 12px rgba(0,0,0,0.2);
+                        transition: transform 0.3s, box-shadow 0.3s;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                    "
+                             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='5px 5px 15px rgba(0,0,0,0.3)';"
+                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='3px 3px 12px rgba(0,0,0,0.2)';">
+
                             <h3 style="margin-bottom: 15px; color:#d63384;">@dest.Name</h3>
                             <p style="margin:5px 0; font-weight:bold;">Fare: ₱@dest.Fare.ToString("F2")</p>
-                            <p style="margin:5px 0; font-size:0.9rem; color:#555;">Departure: @dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</p>
-                            <p style="margin:5px 0; font-size:0.9rem; color:#555;">Arrival: @dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</p>
-                        </div>
+                            <p style="margin:5px 0; font-size:0.9rem; color:#555;">Departure: @dest.DepartureTime</p>
+                            <p style="margin:5px 0; font-size:0.9rem; color:#555;">Arrival: @dest.ArrivalTime</p>
 
-                    </div>
+                        </div>
+                    </a>
                 }
+
             </div>
         }
     </div>
