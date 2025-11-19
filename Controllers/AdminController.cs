@@ -20,14 +20,11 @@ namespace TransportationBookingSystem.Controllers
         // ---------------------
         public async Task<IActionResult> Dashboard(string statusFilter, string routeFilter)
         {
-            // Start with all bookings
             var bookingsQuery = _context.Book.AsQueryable();
 
-            // Filter by status
             if (!string.IsNullOrWhiteSpace(statusFilter))
                 bookingsQuery = bookingsQuery.Where(b => b.Status == statusFilter);
 
-            // Filter by destination/route
             if (!string.IsNullOrWhiteSpace(routeFilter))
                 bookingsQuery = bookingsQuery.Where(b => b.Destination == routeFilter);
 
@@ -35,7 +32,6 @@ namespace TransportationBookingSystem.Controllers
                 .Include(b => b.User)
                 .ToListAsync();
 
-            // Prepare list of distinct routes for dropdown
             ViewBag.Routes = await _context.Destinations
                 .Select(d => d.Name)
                 .ToListAsync();
@@ -72,26 +68,71 @@ namespace TransportationBookingSystem.Controllers
         }
 
         // ---------------------
-        // DESTINATIONS WITH FARE AND TIMES
+        // DESTINATIONS WITH GLOBAL TIME SLOTS
         // ---------------------
         public async Task<IActionResult> Destinations()
         {
             var destinations = await _context.Destinations.ToListAsync();
+
+            // Load global time slot settings
+            var settings = await _context.TimeSlots.FirstOrDefaultAsync();
+
+            // If none exist, create default
+            if (settings == null)
+            {
+                settings = new TimeSlotSettings
+                {
+                    Slot1Start = new TimeSpan(7, 0, 0),
+                    Slot1End = new TimeSpan(8, 0, 0),
+
+                    Slot2Start = new TimeSpan(11, 0, 0),
+                    Slot2End = new TimeSpan(12, 0, 0),
+
+                    Slot3Start = new TimeSpan(14, 0, 0),
+                    Slot3End = new TimeSpan(15, 0, 0),
+
+                    Slot4Start = new TimeSpan(17, 0, 0),
+                    Slot4End = new TimeSpan(18, 0, 0)
+                };
+
+                _context.TimeSlots.Add(settings);
+                await _context.SaveChangesAsync();
+            }
+
+            ViewBag.TimeSlots = settings;
+
             return View("Destinations", destinations);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddDestination(string name, decimal fare, DateTime departureTime, DateTime arrivalTime)
+        public async Task<IActionResult> AddDestination(string name, decimal fare)
         {
             if (!string.IsNullOrWhiteSpace(name))
             {
-                _context.Destinations.Add(new Destination
+                var today = DateTime.Today;
+
+                // Load global time slot settings
+                var settings = await _context.TimeSlots.FirstAsync();
+
+                var slots = new List<(TimeSpan dep, TimeSpan arr)>
                 {
-                    Name = name,
-                    Fare = fare,
-                    DepartureTime = departureTime,
-                    ArrivalTime = arrivalTime
-                });
+                    (settings.Slot1Start, settings.Slot1End),
+                    (settings.Slot2Start, settings.Slot2End),
+                    (settings.Slot3Start, settings.Slot3End),
+                    (settings.Slot4Start, settings.Slot4End)
+                };
+
+                foreach (var slot in slots)
+                {
+                    _context.Destinations.Add(new Destination
+                    {
+                        Name = name,
+                        Fare = fare,
+                        DepartureTime = today.Add(slot.dep),
+                        ArrivalTime = today.Add(slot.arr)
+                    });
+                }
+
                 await _context.SaveChangesAsync();
             }
 
@@ -108,6 +149,7 @@ namespace TransportationBookingSystem.Controllers
                 destination.Fare = fare;
                 destination.DepartureTime = departureTime;
                 destination.ArrivalTime = arrivalTime;
+
                 await _context.SaveChangesAsync();
             }
 
@@ -138,5 +180,22 @@ namespace TransportationBookingSystem.Controllers
 
             return View(model);
         }
+        [HttpPost]
+        public async Task<IActionResult> DeleteBooking(string BookingId)
+        {
+            if (string.IsNullOrWhiteSpace(BookingId))
+                return BadRequest("Invalid booking ID.");
+
+            var booking = await _context.Book.FirstOrDefaultAsync(b => b.BookingId == BookingId);
+
+            if (booking == null)
+                return NotFound("Booking not found.");
+
+            _context.Book.Remove(booking);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Dashboard");
+        }
+
     }
 }

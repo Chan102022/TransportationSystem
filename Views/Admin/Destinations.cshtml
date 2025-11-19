@@ -31,25 +31,74 @@
             Destination Management
         </h1>
 
+        <!-- GLOBAL TIME SLOT SETTINGS -->
+        <div style="margin-bottom: 40px; text-align: left;">
+            <h4>Time Slot Settings</h4>
+
+            <form asp-controller="TimeSettings" asp-action="Save" method="post"
+                  style="display: flex; flex-direction: column; gap: 15px; max-width: 400px;">
+
+                <div>
+                    <label>Slot 1 (Morning)</label>
+                    <div class="d-flex gap-2">
+                        <input type="time" name="Slot1Start" class="form-control" value="@ViewBag.TimeSlots.Slot1Start" required />
+                        <input type="time" name="Slot1End" class="form-control" value="@ViewBag.TimeSlots.Slot1End" required />
+                    </div>
+                </div>
+
+                <div>
+                    <label>Slot 2 (Late Morning)</label>
+                    <div class="d-flex gap-2">
+                        <input type="time" name="Slot2Start" class="form-control" value="@ViewBag.TimeSlots.Slot2Start" required />
+                        <input type="time" name="Slot2End" class="form-control" value="@ViewBag.TimeSlots.Slot2End" required />
+                    </div>
+                </div>
+
+                <div>
+                    <label>Slot 3 (Afternoon)</label>
+                    <div class="d-flex gap-2">
+                        <input type="time" name="Slot3Start" class="form-control" value="@ViewBag.TimeSlots.Slot3Start" required />
+                        <input type="time" name="Slot3End" class="form-control" value="@ViewBag.TimeSlots.Slot3End" required />
+                    </div>
+                </div>
+
+                <div>
+                    <label>Slot 4 (Evening)</label>
+                    <div class="d-flex gap-2">
+                        <input type="time" name="Slot4Start" class="form-control" value="@ViewBag.TimeSlots.Slot4Start" required />
+                        <input type="time" name="Slot4End" class="form-control" value="@ViewBag.TimeSlots.Slot4End" required />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-sm btn-outline-success">Save Time Slots</button>
+            </form>
+
+            <hr style="margin-top: 25px;" />
+        </div>
+
+
         <!-- Add New Destination Form -->
         <div style="margin-bottom: 30px; text-align: left;">
             <h4>Add New Destination</h4>
-            <form asp-action="AddDestination" asp-controller="Admin" method="post" class="d-flex flex-wrap gap-2 align-items-end">
-                <input type="text" name="name" class="form-control" placeholder="Departure-Arrival" required />
-                <input type="number" name="fare" class="form-control" placeholder="Fare" step="0.01" required />
+
+            <form asp-action="AddDestination" asp-controller="Admin"
+                  method="post" class="d-flex flex-wrap gap-2 align-items-end" id="addDestinationForm">
 
                 <div class="d-flex flex-column">
-                    <label for="departureTime" class="form-label small">Departure</label>
-                    <input type="datetime-local" id="departureTime" name="departureTime" class="form-control" required />
+                    <input type="text" name="name" class="form-control"
+                           placeholder="Departure-Arrival" required id="routeNameInput" />
                 </div>
 
-                <div class="d-flex flex-column">
-                    <label for="arrivalTime" class="form-label small">Arrival</label>
-                    <input type="datetime-local" id="arrivalTime" name="arrivalTime" class="form-control" required />
-                </div>
+                <input type="number" name="fare" class="form-control"
+                       placeholder="Fare" step="0.01" required />
 
-                <button type="submit" class="btn btn-sm btn-outline-dark">Add</button>
+                <button type="submit" class="btn btn-sm btn-outline-dark" id="addButton">Add</button>
             </form>
+
+            <!-- Warning Message -->
+            <small id="duplicateWarning" style="color: red; font-weight: bold; display: none;">
+                This route already exists.
+            </small>
         </div>
 
         <!-- Destinations Table -->
@@ -75,17 +124,33 @@
                         <td style="border: 2px solid black; padding: 10px;">@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
                         <td style="border: 2px solid black; padding: 10px;">@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</td>
                         <td style="border: 2px solid black; padding: 10px;">
-                            <form asp-action="EditDestination" asp-controller="Admin" method="post" class="d-flex flex-wrap gap-2 align-items-end">
+                            <form asp-action="EditDestination" asp-controller="Admin"
+                                  method="post" class="d-flex flex-wrap gap-2 align-items-end">
+
                                 <input type="hidden" name="id" value="@dest.Id" />
-                                <input type="text" name="name" value="@dest.Name" class="form-control form-control-sm" required />
-                                <input type="number" name="fare" value="@dest.Fare.ToString("F2")" class="form-control form-control-sm" step="0.01" required />
+
+                                <input type="text" name="name" value="@dest.Name"
+                                       class="form-control form-control-sm" required />
+
+                                <input type="number" name="fare"
+                                       value="@dest.Fare.ToString("F2")"
+                                       class="form-control form-control-sm" step="0.01" required />
+
                                 <input type="datetime-local" name="departureTime"
-                                       value="@dest.DepartureTime.ToString("yyyy-MM-ddTHH:mm")" class="form-control form-control-sm" required />
+                                       value="@dest.DepartureTime.ToString("yyyy-MM-ddTHH:mm")"
+                                       class="form-control form-control-sm" required />
+
                                 <input type="datetime-local" name="arrivalTime"
-                                       value="@dest.ArrivalTime.ToString("yyyy-MM-ddTHH:mm")" class="form-control form-control-sm" required />
+                                       value="@dest.ArrivalTime.ToString("yyyy-MM-ddTHH:mm")"
+                                       class="form-control form-control-sm" required />
+
                                 <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
-                                <a asp-action="DeleteDestination" asp-controller="Admin" asp-route-id="@dest.Id" class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Are you sure you want to delete this destination?');">Delete</a>
+
+                                <a asp-action="DeleteDestination" asp-controller="Admin" asp-route-id="@dest.Id"
+                                   class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Are you sure you want to delete this destination?');">
+                                    Delete
+                                </a>
                             </form>
                         </td>
                     </tr>
@@ -93,32 +158,39 @@
             </tbody>
         </table>
     </div>
+
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // Existing routes from backend
+        const existingRoutes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                        Model.Select(d => d.Name.ToLower().Trim()).Distinct().ToList()
+                ));
+
+        const nameInput = document.querySelector("#routeNameInput");
+        const addButton = document.querySelector("#addButton");
+        const warning = document.querySelector("#duplicateWarning");
+
+        // Duplicate check
+        nameInput.addEventListener("input", function () {
+            const inputValue = nameInput.value.toLowerCase().trim();
+
+            if (existingRoutes.includes(inputValue)) {
+                warning.style.display = "block";
+                addButton.disabled = true;
+            } else {
+                warning.style.display = "none";
+                addButton.disabled = false;
+            }
+        });
+
+        // Confirm Add
+        const addForm = document.querySelector("#addDestinationForm");
+        addForm.addEventListener("submit", function (e) {
+            if (!confirm("Are you sure you want to add this destination?")) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
 </body>
-
-<script>
-    // ADD form validation
-    const departureInput = document.getElementById("departureTime");
-    const arrivalInput = document.getElementById("arrivalTime");
-
-    departureInput.addEventListener("change", function () {
-        arrivalInput.min = this.value; // min date & time
-        if (arrivalInput.value && arrivalInput.value < this.value) {
-            arrivalInput.value = this.value;
-        }
-    });
-
-    // EDIT form validation for each row
-    document.querySelectorAll("form").forEach(form => {
-        const dep = form.querySelector("input[name='departureTime']");
-        const arr = form.querySelector("input[name='arrivalTime']");
-
-        if (dep && arr) {
-            dep.addEventListener("change", function () {
-                arr.min = dep.value; // restrict arrival date & time
-                if (arr.value && arr.value < dep.value) {
-                    arr.value = dep.value;
-                }
-            });
-        }
-    });
-</script>

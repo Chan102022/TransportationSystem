@@ -33,10 +33,16 @@
             Admin Dashboard
         </h1>
 
-        <!-- Available Routes -->
+        <!-- ======================== -->
+        <!-- AVAILABLE ROUTES SECTION -->
+        <!-- ======================== -->
         <div style="margin-bottom: 30px; text-align: left;">
             <h4>Available Routes</h4>
-            <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+
+            <!-- ROUTE SEARCH BAR -->
+            <input type="text" id="routeSearch" class="form-control mb-3" placeholder="Search route...">
+
+            <table style="width:100%; border-collapse: collapse; margin-top: 10px;" id="routeTable">
                 <thead style="background-color: pink; color: black;">
                     <tr>
                         <th style="border: 3px solid black; padding: 10px;">ID</th>
@@ -61,10 +67,16 @@
             </table>
         </div>
 
-        <!-- All Bookings -->
+        <!-- ==================== -->
+        <!-- BOOKINGS SECTION     -->
+        <!-- ==================== -->
         <div style="margin-top: 40px; text-align: left;">
             <h4>All Bookings</h4>
-            <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+
+            <!-- PASSENGER SEARCH BAR -->
+            <input type="text" id="bookingSearch" class="form-control mb-3" placeholder="Search passenger, route, seat, status...">
+
+            <table style="width:100%; border-collapse: collapse; margin-top: 10px;" id="bookingTable">
                 <thead style="background-color: pink; color: black;">
                     <tr>
                         <th style="border: 3px solid black; padding: 10px;">Passenger Name</th>
@@ -94,4 +106,32 @@
         </div>
 
     </div>
+
 </body>
+
+<!-- ======================= -->
+<!-- JAVASCRIPT SEARCH LOGIC -->
+<!-- ======================= -->
+<script>
+    // ROUTE FILTER
+    document.getElementById("routeSearch").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#routeTable tbody tr");
+
+        rows.forEach(row => {
+            let route = row.cells[1].innerText.toLowerCase();
+            row.style.display = route.includes(filter) ? "" : "none";
+        });
+    });
+
+    // BOOKINGS FILTER
+    document.getElementById("bookingSearch").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#bookingTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+</script>
