@@ -221,5 +221,33 @@ namespace TransportationBookingSystem.Controllers
 
             return View(booking);
         }
+        [HttpGet]
+        public IActionResult GetPassengersByRoute(int id)
+        {
+            // Step 1: find destination name by ID
+            var destination = _context.Destinations
+                .FirstOrDefault(d => d.Id == id);
+
+            if (destination == null)
+                return Json(new { error = "Destination not found" });
+
+            string routeName = destination.Name;
+
+            // Step 2: get all bookings for this route for TODAY
+            var passengers = _context.Book
+                .Where(b => b.Destination == routeName &&
+                            b.DepartureTime.Date == DateTime.Now.Date)
+                .Select(b => new
+                {
+                    name = b.Name,
+                    seatNo = b.SeatNo,
+                    status = b.Status
+                })
+                .ToList();
+
+            return Json(passengers);
+        }
+
+
     }
 }

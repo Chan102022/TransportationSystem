@@ -10,172 +10,222 @@
         border: 5px solid black;
         background-color: white;
         border-radius: 20px;
-        padding: 30px;
+        padding: 40px;
         margin: 40px auto;
         width: 95%;
         max-width: 1300px;
         text-align: center;
-        box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.25);
     ">
 
-        <!-- Heading -->
+        <!-- PAGE TITLE -->
         <h1 style="
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            padding: 10px 30px;
+            font-size: 2.6rem;
+            margin-bottom: 35px;
+            padding: 10px 35px;
             display: inline-block;
             border: 5px solid black;
             border-radius: 20px;
-            background-color: pink;
+            background-color: #ffb6d9;
+            color: black;
+            font-weight: bold;
         ">
-            Destination Management
+            🚌 Destination Management
         </h1>
 
-        <!-- GLOBAL TIME SLOT SETTINGS -->
-        <div style="margin-bottom: 40px; text-align: left;">
-            <h4>Time Slot Settings</h4>
+
+        <!-- ===================== -->
+        <!-- TIME SLOT SETTINGS    -->
+        <!-- ===================== -->
+        <div style="
+            text-align: left;
+            background: #ffd9ec;
+            border: 3px solid black;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 45px;
+        ">
+            <h3 style="margin-bottom: 20px; font-weight: bold;">⏰ Time Slot Settings</h3>
 
             <form asp-controller="TimeSettings" asp-action="Save" method="post"
-                  style="display: flex; flex-direction: column; gap: 15px; max-width: 400px;">
+                  style="display: flex; flex-direction: column; gap: 15px; max-width: 450px;">
 
                 <div>
-                    <label>Slot 1 (Morning)</label>
+                    <label><b>Slot 1 (Morning)</b></label>
                     <div class="d-flex gap-2">
-                        <input type="time" name="Slot1Start" class="form-control" value="@ViewBag.TimeSlots.Slot1Start" required />
-                        <input type="time" name="Slot1End" class="form-control" value="@ViewBag.TimeSlots.Slot1End" required />
+                        <input type="time" name="Slot1Start" value="@ViewBag.TimeSlots.Slot1Start" class="form-control" required />
+                        <input type="time" name="Slot1End" value="@ViewBag.TimeSlots.Slot1End" class="form-control" required />
                     </div>
                 </div>
 
                 <div>
-                    <label>Slot 2 (Late Morning)</label>
+                    <label><b>Slot 2 (Late Morning)</b></label>
                     <div class="d-flex gap-2">
-                        <input type="time" name="Slot2Start" class="form-control" value="@ViewBag.TimeSlots.Slot2Start" required />
-                        <input type="time" name="Slot2End" class="form-control" value="@ViewBag.TimeSlots.Slot2End" required />
+                        <input type="time" name="Slot2Start" value="@ViewBag.TimeSlots.Slot2Start" class="form-control" required />
+                        <input type="time" name="Slot2End" value="@ViewBag.TimeSlots.Slot2End" class="form-control" required />
                     </div>
                 </div>
 
                 <div>
-                    <label>Slot 3 (Afternoon)</label>
+                    <label><b>Slot 3 (Afternoon)</b></label>
                     <div class="d-flex gap-2">
-                        <input type="time" name="Slot3Start" class="form-control" value="@ViewBag.TimeSlots.Slot3Start" required />
-                        <input type="time" name="Slot3End" class="form-control" value="@ViewBag.TimeSlots.Slot3End" required />
+                        <input type="time" name="Slot3Start" value="@ViewBag.TimeSlots.Slot3Start" class="form-control" required />
+                        <input type="time" name="Slot3End" value="@ViewBag.TimeSlots.Slot3End" class="form-control" required />
                     </div>
                 </div>
 
                 <div>
-                    <label>Slot 4 (Evening)</label>
+                    <label><b>Slot 4 (Evening)</b></label>
                     <div class="d-flex gap-2">
-                        <input type="time" name="Slot4Start" class="form-control" value="@ViewBag.TimeSlots.Slot4Start" required />
-                        <input type="time" name="Slot4End" class="form-control" value="@ViewBag.TimeSlots.Slot4End" required />
+                        <input type="time" name="Slot4Start" value="@ViewBag.TimeSlots.Slot4Start" class="form-control" required />
+                        <input type="time" name="Slot4End" value="@ViewBag.TimeSlots.Slot4End" class="form-control" required />
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-sm btn-outline-success">Save Time Slots</button>
+                <button type="submit" class="btn btn-outline-dark"
+                        style="border-width: 3px; font-weight: bold;">
+                    ✔ Save Slots
+                </button>
             </form>
-
-            <hr style="margin-top: 25px;" />
         </div>
 
 
-        <!-- Add New Destination Form -->
-        <div style="margin-bottom: 30px; text-align: left;">
-            <h4>Add New Destination</h4>
+        <!-- ======================= -->
+        <!-- ADD NEW DESTINATION     -->
+        <!-- ======================= -->
+        <div style="
+            text-align: left;
+            background: #ffe6f3;
+            border: 3px solid black;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+        ">
+            <h3 style="margin-bottom: 15px; font-weight: bold;">➕ Add New Destination</h3>
 
             <form asp-action="AddDestination" asp-controller="Admin"
-                  method="post" class="d-flex flex-wrap gap-2 align-items-end" id="addDestinationForm">
+                  method="post" class="d-flex flex-wrap gap-3 align-items-end" id="addDestinationForm">
 
-                <div class="d-flex flex-column">
-                    <input type="text" name="name" class="form-control"
-                           placeholder="Departure-Arrival" required id="routeNameInput" />
-                </div>
+                <input type="text" name="name" id="routeNameInput"
+                       placeholder="e.g. Manila → Baguio"
+                       class="form-control"
+                       style="max-width: 300px; font-weight: bold;" required />
 
-                <input type="number" name="fare" class="form-control"
-                       placeholder="Fare" step="0.01" required />
+                <input type="number" name="fare"
+                       placeholder="Fare (₱)" class="form-control"
+                       style="max-width: 150px;" step="0.01" required />
 
-                <button type="submit" class="btn btn-sm btn-outline-dark" id="addButton">Add</button>
+                <button type="submit" id="addButton"
+                        class="btn btn-dark"
+                        style="border: 3px solid black; font-weight: bold;">
+                    Add
+                </button>
             </form>
 
-            <!-- Warning Message -->
             <small id="duplicateWarning" style="color: red; font-weight: bold; display: none;">
-                This route already exists.
+                ⚠ Route already exists!
             </small>
         </div>
 
-        <!-- Destinations Table -->
-        <h4>All Destinations</h4>
-        <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
-            <thead style="background-color: pink; color: black;">
-                <tr>
-                    <th style="border: 3px solid black; padding: 10px;">ID</th>
-                    <th style="border: 3px solid black; padding: 10px;">Name</th>
-                    <th style="border: 3px solid black; padding: 10px;">Fare</th>
-                    <th style="border: 3px solid black; padding: 10px;">Departure</th>
-                    <th style="border: 3px solid black; padding: 10px;">Arrival</th>
-                    <th style="border: 3px solid black; padding: 10px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var dest in Model)
-                {
-                    <tr style="background-color: #fdfdfd;">
-                        <td style="border: 2px solid black; padding: 10px;">@dest.Id</td>
-                        <td style="border: 2px solid black; padding: 10px;">@dest.Name</td>
-                        <td style="border: 2px solid black; padding: 10px;">@dest.Fare.ToString("F2")</td>
-                        <td style="border: 2px solid black; padding: 10px;">@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
-                        <td style="border: 2px solid black; padding: 10px;">@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</td>
-                        <td style="border: 2px solid black; padding: 10px;">
-                            <form asp-action="EditDestination" asp-controller="Admin"
-                                  method="post" class="d-flex flex-wrap gap-2 align-items-end">
 
-                                <input type="hidden" name="id" value="@dest.Id" />
+        <!-- ======================= -->
+        <!-- SEARCH BAR -->
+        <!-- ======================= -->
+        <div style="text-align: left; margin-bottom: 20px;">
+            <input id="destinationSearch" type="text"
+                   class="form-control"
+                   placeholder="🔍 Search destinations..."
+                   style="max-width: 300px; border: 2px solid black; font-weight: bold;">
+        </div>
 
-                                <input type="text" name="name" value="@dest.Name"
-                                       class="form-control form-control-sm" required />
 
-                                <input type="number" name="fare"
-                                       value="@dest.Fare.ToString("F2")"
-                                       class="form-control form-control-sm" step="0.01" required />
+        <!-- ======================= -->
+        <!-- DESTINATION LIST TABLE -->
+        <!-- ======================= -->
+        <h3 style="margin-bottom: 15px; font-weight: bold;">📋 All Destinations</h3>
 
-                                <input type="datetime-local" name="departureTime"
-                                       value="@dest.DepartureTime.ToString("yyyy-MM-ddTHH:mm")"
-                                       class="form-control form-control-sm" required />
-
-                                <input type="datetime-local" name="arrivalTime"
-                                       value="@dest.ArrivalTime.ToString("yyyy-MM-ddTHH:mm")"
-                                       class="form-control form-control-sm" required />
-
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
-
-                                <a asp-action="DeleteDestination" asp-controller="Admin" asp-route-id="@dest.Id"
-                                   class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Are you sure you want to delete this destination?');">
-                                    Delete
-                                </a>
-                            </form>
-                        </td>
+        <div style="
+            max-height: 500px;
+            overflow-y: auto;
+            border: 3px solid black;
+            border-radius: 15px;
+        ">
+            <table style="width:100%; border-collapse: collapse; background: white;" id="destinationTable">
+                <thead style="background-color: #ffb6d9; color: black; font-weight: bold;">
+                    <tr>
+                        <th style="border: 2px solid black; padding: 10px;">ID</th>
+                        <th style="border: 2px solid black; padding: 10px;">Destination</th>
+                        <th style="border: 2px solid black; padding: 10px;">Fare</th>
+                        <th style="border: 2px solid black; padding: 10px;">Departure</th>
+                        <th style="border: 2px solid black; padding: 10px;">Arrival</th>
+                        <th style="border: 2px solid black; padding: 10px;">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    @foreach (var dest in Model)
+                    {
+                        <tr style="background-color: #fff4fa;">
+                            <td style="border: 2px solid black; padding: 10px;">@dest.Id</td>
+                            <td style="border: 2px solid black; padding: 10px; font-weight: bold;">@dest.Name</td>
+                            <td style="border: 2px solid black; padding: 10px;">₱@dest.Fare.ToString("F2")</td>
+                            <td style="border: 2px solid black; padding: 10px;">@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td style="border: 2px solid black; padding: 10px;">@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</td>
+
+                            <td style="border: 2px solid black; padding: 10px;">
+                                <form asp-action="EditDestination" asp-controller="Admin"
+                                      method="post" class="d-flex flex-column gap-2">
+
+                                    <input type="hidden" name="id" value="@dest.Id" />
+
+                                    <input type="text" name="name" value="@dest.Name"
+                                           class="form-control form-control-sm" required />
+
+                                    <input type="number" name="fare"
+                                           value="@dest.Fare" step="0.01"
+                                           class="form-control form-control-sm" required />
+
+                                    <input type="datetime-local" name="departureTime"
+                                           value="@dest.DepartureTime.ToString("yyyy-MM-ddTHH:mm")"
+                                           class="form-control form-control-sm" required />
+
+                                    <input type="datetime-local" name="arrivalTime"
+                                           value="@dest.ArrivalTime.ToString("yyyy-MM-ddTHH:mm")"
+                                           class="form-control form-control-sm" required />
+
+                                    <button class="btn btn-sm btn-outline-primary">Update</button>
+
+                                    <a asp-action="DeleteDestination" asp-controller="Admin" asp-route-id="@dest.Id"
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Delete this destination?');">
+                                        Delete
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
 
     <!-- JAVASCRIPT -->
     <script>
-        // Existing routes from backend
+        // DUPLICATE CHECKER
         const existingRoutes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
                         Model.Select(d => d.Name.ToLower().Trim()).Distinct().ToList()
                 ));
 
-        const nameInput = document.querySelector("#routeNameInput");
-        const addButton = document.querySelector("#addButton");
-        const warning = document.querySelector("#duplicateWarning");
+        nameInput = document.querySelector("#routeNameInput");
+        addButton = document.querySelector("#addButton");
+        warning = document.querySelector("#duplicateWarning");
 
-        // Duplicate check
         nameInput.addEventListener("input", function () {
-            const inputValue = nameInput.value.toLowerCase().trim();
+            let text = nameInput.value.toLowerCase().trim();
 
-            if (existingRoutes.includes(inputValue)) {
+            if (existingRoutes.includes(text)) {
                 warning.style.display = "block";
                 addButton.disabled = true;
             } else {
@@ -184,12 +234,20 @@
             }
         });
 
-        // Confirm Add
-        const addForm = document.querySelector("#addDestinationForm");
-        addForm.addEventListener("submit", function (e) {
-            if (!confirm("Are you sure you want to add this destination?")) {
-                e.preventDefault();
-            }
+        // CONFIRM ADD
+        document.querySelector("#addDestinationForm").addEventListener("submit", function (e) {
+            if (!confirm("Add this destination?")) e.preventDefault();
+        });
+
+        // SEARCH BAR FOR TABLE
+        document.getElementById("destinationSearch").addEventListener("input", function () {
+            let filter = this.value.toLowerCase();
+            let rows = document.querySelectorAll("#destinationTable tbody tr");
+
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
         });
     </script>
 

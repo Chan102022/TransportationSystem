@@ -20,7 +20,6 @@
         box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
     ">
 
-        <!-- Heading -->
         <h1 style="
             font-size: 2.5rem;
             margin-bottom: 30px;
@@ -33,47 +32,65 @@
             Admin Dashboard
         </h1>
 
-        <!-- ======================== -->
-        <!-- AVAILABLE ROUTES SECTION -->
-        <!-- ======================== -->
+        <!-- AVAILABLE ROUTES -->
         <div style="margin-bottom: 30px; text-align: left;">
-            <h4>Available Routes</h4>
+            <h4 style="font-size: 1.8rem; font-weight: bold; margin-bottom: 15px;">Available Bus Routes</h4>
 
-            <!-- ROUTE SEARCH BAR -->
             <input type="text" id="routeSearch" class="form-control mb-3" placeholder="Search route...">
 
-            <table style="width:100%; border-collapse: collapse; margin-top: 10px;" id="routeTable">
-                <thead style="background-color: pink; color: black;">
-                    <tr>
-                        <th style="border: 3px solid black; padding: 10px;">ID</th>
-                        <th style="border: 3px solid black; padding: 10px;">Route</th>
-                        <th style="border: 3px solid black; padding: 10px;">Fare</th>
-                        <th style="border: 3px solid black; padding: 10px;">Departure</th>
-                        <th style="border: 3px solid black; padding: 10px;">Arrival</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var dest in destinations)
-                    {
-                        <tr style="background-color: #fdfdfd;">
-                            <td style="border: 2px solid black; padding: 10px;">@dest.Id</td>
-                            <td style="border: 2px solid black; padding: 10px;">@dest.Name</td>
-                            <td style="border: 2px solid black; padding: 10px;">@dest.Fare.ToString("F2")</td>
-                            <td style="border: 2px solid black; padding: 10px;">@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
-                            <td style="border: 2px solid black; padding: 10px;">@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <ul id="routeList" style="list-style: none; padding: 0; margin: 0;">
+                @foreach (var dest in destinations)
+                {
+                    var departure = dest.DepartureTime;
+                    var arrival = dest.ArrivalTime;
+
+                    <li class="route-item"
+                        data-route="@dest.Name"
+                        data-id="@dest.Id"
+                        data-departure="@departure.ToString("yyyy-MM-dd HH:mm")"
+                        style="
+                        border: 3px solid black;
+                        background-color: #fff;
+                        border-radius: 15px;
+                        padding: 20px;
+                        margin-bottom: 15px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+                        cursor: default;
+                    ">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.6rem;">🚌 @dest.Name</h3>
+                            <p style="margin: 5px 0 0 0; font-size: 1rem; color: #444;">
+                                Departure: <b>@departure.ToString("yyyy-MM-dd HH:mm")</b><br />
+                                Arrival: <b>@arrival.ToString("yyyy-MM-dd HH:mm")</b>
+                            </p>
+                        </div>
+
+                        <div style="text-align: right;">
+                            <span style="
+                            font-size: 1.3rem;
+                            font-weight: bold;
+                            background-color: pink;
+                            padding: 8px 15px;
+                            border: 3px solid black;
+                            border-radius: 15px;
+                        ">
+                                ₱@dest.Fare.ToString("F2")
+                            </span>
+                        </div>
+                    </li>
+                }
+            </ul>
+
         </div>
 
-        <!-- ==================== -->
-        <!-- BOOKINGS SECTION     -->
-        <!-- ==================== -->
+
+        <!-- ALL BOOKINGS -->
         <div style="margin-top: 40px; text-align: left;">
             <h4>All Bookings</h4>
 
-            <!-- PASSENGER SEARCH BAR -->
             <input type="text" id="bookingSearch" class="form-control mb-3" placeholder="Search passenger, route, seat, status...">
 
             <table style="width:100%; border-collapse: collapse; margin-top: 10px;" id="bookingTable">
@@ -109,29 +126,77 @@
 
 </body>
 
-<!-- ======================= -->
-<!-- JAVASCRIPT SEARCH LOGIC -->
-<!-- ======================= -->
+
+<!-- MODAL (CLOSE TEXT REMOVED) -->
+<div id="passengerModal" style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+">
+    <div style="
+        background: white;
+        width: 500px;
+        max-height: 80%;
+        overflow-y: auto;
+        padding: 20px;
+        border: 4px solid black;
+        border-radius: 20px;
+    ">
+        <h3 id="modalTitle">Passengers</h3>
+        <ul id="modalPassengerList"></ul>
+
+        <button onclick="closePassengerModal()" style="
+            margin-top: 15px; padding: 10px 20px;
+            background: pink; border: 3px solid black;
+            border-radius: 12px; cursor: pointer;
+        ">
+        </button>
+    </div>
+</div>
+
+
 <script>
-    // ROUTE FILTER
+
     document.getElementById("routeSearch").addEventListener("keyup", function () {
         let filter = this.value.toLowerCase();
-        let rows = document.querySelectorAll("#routeTable tbody tr");
-
-        rows.forEach(row => {
-            let route = row.cells[1].innerText.toLowerCase();
-            row.style.display = route.includes(filter) ? "" : "none";
+        let items = document.querySelectorAll("#routeList .route-item");
+        items.forEach(item => {
+            let text = item.innerText.toLowerCase();
+            item.style.display = text.includes(filter) ? "" : "none";
         });
     });
 
-    // BOOKINGS FILTER
     document.getElementById("bookingSearch").addEventListener("keyup", function () {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll("#bookingTable tbody tr");
-
         rows.forEach(row => {
             let text = row.innerText.toLowerCase();
             row.style.display = text.includes(filter) ? "" : "none";
         });
     });
+
+    setInterval(() => location.reload(), 60000);
+
+    function closePassengerModal() {
+        document.getElementById("passengerModal").style.display = "none";
+    }
+
 </script>
+
+<style>
+    @@keyframes flip {
+        0% {
+            transform: rotateX(90deg);
+            opacity: 0;
+        }
+
+        100% {
+            transform: rotateX(0deg);
+            opacity: 1;
+        }
+    }
+</style>

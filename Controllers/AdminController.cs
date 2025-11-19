@@ -26,6 +26,24 @@ namespace TransportationBookingSystem.Controllers
         {
             var bookingsQuery = _context.Book.AsQueryable();
 
+            // ===============================
+            // DEFAULT: show only TODAY’S bookings
+            // ===============================
+            if (!dateFilter.HasValue)
+            {
+                var today = DateTime.Now.Date;
+                bookingsQuery = bookingsQuery.Where(b => b.BookingDate.Date == today);
+
+                // Pass default date (today) to UI
+                ViewBag.DateFilter = today.ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                // If user selects a date, filter normally
+                bookingsQuery = bookingsQuery.Where(b => b.BookingDate.Date == dateFilter.Value.Date);
+                ViewBag.DateFilter = dateFilter.Value.ToString("yyyy-MM-dd");
+            }
+
             // Filter by status
             if (!string.IsNullOrWhiteSpace(statusFilter))
                 bookingsQuery = bookingsQuery.Where(b => b.Status == statusFilter);
@@ -34,11 +52,7 @@ namespace TransportationBookingSystem.Controllers
             if (!string.IsNullOrWhiteSpace(routeFilter))
                 bookingsQuery = bookingsQuery.Where(b => b.Destination == routeFilter);
 
-            // Filter by date
-            if (dateFilter.HasValue)
-                bookingsQuery = bookingsQuery.Where(b => b.BookingDate.Date == dateFilter.Value.Date);
-
-            // Filter by time (within the hour)
+            // Filter by time (same hour range)
             if (timeFilter.HasValue)
             {
                 var start = timeFilter.Value;
@@ -50,17 +64,17 @@ namespace TransportationBookingSystem.Controllers
                 );
             }
 
+            // Final list with User relation included
             var bookings = await bookingsQuery
                 .Include(b => b.User)
                 .ToListAsync();
 
-            // Send back filters to UI
+            // Send filters to view
             ViewBag.StatusFilter = statusFilter;
             ViewBag.RouteFilter = routeFilter;
-            ViewBag.DateFilter = dateFilter?.ToString("yyyy-MM-dd");
             ViewBag.TimeFilter = timeFilter?.ToString(@"hh\:mm");
 
-            // Load all route names for dropdown
+            // Load route dropdown
             ViewBag.Routes = await _context.Destinations
                 .Select(d => d.Name)
                 .Distinct()
@@ -68,6 +82,7 @@ namespace TransportationBookingSystem.Controllers
 
             return View(bookings);
         }
+
 
 
         public async Task<IActionResult> ViewAllBookings()
@@ -224,28 +239,61 @@ namespace TransportationBookingSystem.Controllers
 
             return RedirectToAction("Dashboard");
         }
-        public async Task<IActionResult> Earnings(DateTime? date)
+        public async Task<IActionResult> AdminRevenue(DateTime? date, bool monthly = false)
         {
-            // If no date provided, use today
             var selectedDate = date?.Date ?? DateTime.Today;
 
-            // Fetch all PAID bookings on that day
-            var paidBookings = await _context.Book
-                .Where(b => b.PaymentStatus == "Paid"
-                            && b.DatePaid.HasValue
-                            && b.DatePaid.Value.Date == selectedDate)
-                .ToListAsync();
+            IQueryable<Passenger> query = _context.Book
+                .Where(b => b.PaymentStatus == "Paid" && b.DatePaid.HasValue);
 
-            // Calculate total earned
-            decimal total = paidBookings.Sum(p => p.Fare);
+            // Monthly Mode
+            if (monthly)
+            {
+                query = query.Where(b =>
+                    b.DatePaid.Value.Month == selectedDate.Month &&
+                    b.DatePaid.Value.Year == selectedDate.Year);
+
+                ViewBag.EarningsTitle = $"{selectedDate:MMMM yyyy} - Monthly Earnings";
+            }
+            else
+            {
+                // Daily Mode
+                query = query.Where(b =>
+                    b.DatePaid.Value.Date == selectedDate.Date);
+
+                ViewBag.EarningsTitle = $"{selectedDate:MMMM dd, yyyy} - Daily Earnings";
+            }
+
+            var bookings = await query.ToListAsync();
 
             ViewBag.SelectedDate = selectedDate.ToString("yyyy-MM-dd");
-            ViewBag.TotalEarnings = total;
+            ViewBag.TotalEarnings = bookings.Sum(b => b.Fare);
 
-            return View(paidBookings);
+            return View("AdminRevenue", bookings);
+        }
+
+
+        [HttpPost]
+        public IActionResult BulkUpdateStatus([FromBody] BulkUpdateModel data)
+        {
+            var bookings = _context.Book.Where(b => data.Ids.Contains(b.BookingId)).ToList();
+
+            foreach (var b in bookings)
+                b.Status = data.Status;
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        public class BulkUpdateModel
+        {
+            public List<string> Ids { get; set; }
+            public string Status { get; set; }
         }
 
 
 
+
     }
-}
+} 
