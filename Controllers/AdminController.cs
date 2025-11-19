@@ -18,29 +18,57 @@ namespace TransportationBookingSystem.Controllers
         // ---------------------
         // BOOKINGS DASHBOARD
         // ---------------------
-        public async Task<IActionResult> Dashboard(string statusFilter, string routeFilter)
+        public async Task<IActionResult> Dashboard(
+     string statusFilter,
+     string routeFilter,
+     DateTime? dateFilter,
+     TimeSpan? timeFilter)
         {
             var bookingsQuery = _context.Book.AsQueryable();
 
+            // Filter by status
             if (!string.IsNullOrWhiteSpace(statusFilter))
                 bookingsQuery = bookingsQuery.Where(b => b.Status == statusFilter);
 
+            // Filter by destination
             if (!string.IsNullOrWhiteSpace(routeFilter))
                 bookingsQuery = bookingsQuery.Where(b => b.Destination == routeFilter);
+
+            // Filter by date
+            if (dateFilter.HasValue)
+                bookingsQuery = bookingsQuery.Where(b => b.BookingDate.Date == dateFilter.Value.Date);
+
+            // Filter by time (within the hour)
+            if (timeFilter.HasValue)
+            {
+                var start = timeFilter.Value;
+                var end = start.Add(TimeSpan.FromMinutes(59));
+
+                bookingsQuery = bookingsQuery.Where(b =>
+                    b.BookingDate.TimeOfDay >= start &&
+                    b.BookingDate.TimeOfDay <= end
+                );
+            }
 
             var bookings = await bookingsQuery
                 .Include(b => b.User)
                 .ToListAsync();
 
-            ViewBag.Routes = await _context.Destinations
-                .Select(d => d.Name)
-                .ToListAsync();
-
+            // Send back filters to UI
             ViewBag.StatusFilter = statusFilter;
             ViewBag.RouteFilter = routeFilter;
+            ViewBag.DateFilter = dateFilter?.ToString("yyyy-MM-dd");
+            ViewBag.TimeFilter = timeFilter?.ToString(@"hh\:mm");
+
+            // Load all route names for dropdown
+            ViewBag.Routes = await _context.Destinations
+                .Select(d => d.Name)
+                .Distinct()
+                .ToListAsync();
 
             return View(bookings);
         }
+
 
         public async Task<IActionResult> ViewAllBookings()
         {
@@ -216,6 +244,7 @@ namespace TransportationBookingSystem.Controllers
 
             return View(paidBookings);
         }
+
 
 
     }

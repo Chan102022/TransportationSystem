@@ -1,0 +1,55 @@
+﻿
+@model TransportationBookingSystem.Models.Passenger
+
+@{
+    ViewData["Title"] = "Verify Payment";
+}
+
+<div style="max-width:700px; margin:40px auto; padding:25px; background:white; border:4px solid black; border-radius:12px;">
+    <h2 class="text-center mb-3">Verify Booking Payment</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Success"]</div>
+    }
+
+    <div style="display:flex; gap:20px;">
+        <div style="flex:1;">
+            <p><strong>Booking ID:</strong> @Model.BookingId</p>
+            <p><strong>Name:</strong> @Model.Name</p>
+            <p><strong>Destination:</strong> @Model.Destination</p>
+            <p><strong>Bus No:</strong> @Model.BusNo</p>
+            <p><strong>Seat No:</strong> @Model.SeatNo</p>
+            <p><strong>Departure:</strong> @Model.DepartureTime.ToString("yyyy-MM-dd HH:mm")</p>
+            <p><strong>Arrival:</strong> @Model.ArrivalTime.ToString("yyyy-MM-dd HH:mm")</p>
+        </div>
+
+        <div style="width:220px; text-align:center;">
+            @if (!string.IsNullOrEmpty(Model.QRCodeImage))
+            {
+                <img src="@Model.QRCodeImage" alt="QR" style="max-width:200px; border:1px solid #ccc; padding:6px; background:#fff;" />
+            }
+            <p style="margin-top:12px;"><strong>Fare:</strong><br />₱@Model.Fare.ToString("N2")</p>
+            <p><strong>Payment:</strong><br />@Model.PaymentStatus</p>
+            <p><strong>Booked:</strong><br />@Model.BookingDate.ToString("yyyy-MM-dd HH:mm")</p>
+        </div>
+    </div>
+
+    <div style="margin-top:20px;">
+        @if (Model.PaymentStatus != "Paid")
+        {
+            <form asp-controller="Conductor" asp-action="MarkAsPaid" method="post">
+                <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                <button type="submit" class="btn btn-success btn-lg w-100">Mark as Paid</button>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-success text-center fw-bold">Already marked as PAID at @Model.DatePaid?.ToString("yyyy-MM-dd HH:mm")</div>
+        }
+    </div>
+
+    <div style="text-align:center; margin-top:12px;">
+        <a class="btn btn-outline-dark" asp-controller="Conductor" asp-action="Dashboard">Back to Dashboard</a>
+    </div>
+</div>

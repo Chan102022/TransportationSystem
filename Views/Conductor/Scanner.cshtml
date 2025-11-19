@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "QR Scanner";
+}
+
+<div style="max-width: 600px; margin: 30px auto; padding: 20px; background: white; border: 3px solid black; border-radius: 15px;">
+    <h2 class="text-center mb-3">QR Code Scanner</h2>
+
+    <p class="text-center">Align the QR code in front of the camera.</p>
+
+    <div id="reader" style="width: 100%;"></div>
+
+    <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+    <div id="result" style="margin-top: 20px; font-size: 1.2em; text-align: center; color: green; font-weight: bold;"></div>
+</div>
+
+<!-- Html5Qrcode script -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<script>
+    const beepSound = document.getElementById("beepSound");
+
+    function onScanSuccess(decodedText, decodedResult) {
+
+        // Stop scanning once successful
+        html5QrCode.stop();
+
+        // Play beep
+        beepSound.play();
+
+        // Show result on screen
+        document.getElementById("result").innerText = "Scanned: " + decodedText;
+
+        // Redirect after a short delay
+        setTimeout(() => {
+            window.location.href = `/Conductor/Verify?id=${decodedText}`;
+        }, 800);
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+
+    Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+            let cameraId = devices[0].id;
+            html5QrCode.start(
+                cameraId,
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+                onScanSuccess
+            );
+        }
+    }).catch(err => {
+        document.getElementById("result").innerText = "Camera error: " + err;
+    });
+</script>
+
+<style>
+    body {
+        background-color: pink;
+        font-family: Arial;
+    }
+</style>

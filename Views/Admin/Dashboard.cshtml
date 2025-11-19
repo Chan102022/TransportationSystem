@@ -34,31 +34,48 @@
 
         <div class="card mb-3 p-3">
             <h4>Filter Bookings</h4>
-            <form asp-action="Dashboard" asp-controller="Admin" method="get" class="d-flex gap-2 flex-wrap">
+            <form asp-action="Dashboard" asp-controller="Admin" method="get" class="d-flex gap-3 flex-wrap">
+
+                <!-- Status Filter -->
                 <div class="d-flex flex-column">
                     <label>Status</label>
                     <select name="statusFilter" class="form-select">
                         <option value="">All</option>
-                        <option value="Pending" selected="@(ViewBag.StatusFilter == "Pending" ? "selected" : null)">Pending</option>
-                        <option value="Confirmed" selected="@(ViewBag.StatusFilter == "Confirmed" ? "selected" : null)">Confirmed</option>
-                        <option value="Canceled" selected="@(ViewBag.StatusFilter == "Canceled" ? "selected" : null)">Canceled</option>
+                        <option value="Pending" selected="@(ViewBag.StatusFilter == "Pending")">Pending</option>
+                        <option value="Confirmed" selected="@(ViewBag.StatusFilter == "Confirmed")">Confirmed</option>
+                        <option value="Canceled" selected="@(ViewBag.StatusFilter == "Canceled")">Canceled</option>
                     </select>
                 </div>
 
+                <!-- Destination Filter -->
                 <div class="d-flex flex-column">
                     <label>Destination</label>
                     <select name="routeFilter" class="form-select">
                         <option value="">All</option>
                         @foreach (var route in ViewBag.Routes as List<string> ?? new List<string>())
                         {
-                            <option value="@route" selected="@(ViewBag.RouteFilter == route ? "selected" : null)">@route</option>
+                            <option value="@route" selected="@(ViewBag.RouteFilter == route)">
+                                @route
+                            </option>
                         }
                     </select>
                 </div>
 
+                <!-- Date Filter -->
+                <div class="d-flex flex-column">
+                    <label>Date</label>
+                    <input type="date" name="dateFilter" class="form-control"
+                           value="@(ViewBag.DateFilter ?? "")" />
+
+                </div>
+
+                <!-- Time Filter -->
+               
+
                 <button type="submit" class="btn btn-outline-dark align-self-end">Filter</button>
             </form>
         </div>
+
 
         <table class="table table-bordered mt-3">
             <thead class="table-dark">
@@ -110,13 +127,14 @@
                             </form>
 
                             <!-- DELETE BUTTON -->
-                            <form asp-action="DeleteBooking" asp-controller="Admin" method="post"
-                                  onsubmit="return confirm('Are you sure you want to delete this booking?');">
+                            <!-- DELETE BUTTON -->
+                            <form asp-action="DeleteBooking" asp-controller="Admin" method="post" class="delete-form">
                                 <input type="hidden" name="BookingId" value="@booking.BookingId" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger w-100 mt-1">
+                                <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-1 delete-btn">
                                     Delete
                                 </button>
                             </form>
+
                         </td>
 
                     </tr>
@@ -125,3 +143,16 @@
         </table>
     </div>
 </div>
+@section Scripts {
+    <script>
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let form = this.closest("form");
+
+                if (confirm("⚠ Are you sure you want to delete this booking?\nThis action cannot be undone.")) {
+                    form.submit();
+                }
+            });
+        });
+    </script>
+}

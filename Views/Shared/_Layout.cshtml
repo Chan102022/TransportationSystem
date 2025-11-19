@@ -5,6 +5,7 @@
 
 @{
     var isAdmin = false;
+    var isConductor = false;
 
     if (SignInManager.IsSignedIn(User))
     {
@@ -13,6 +14,7 @@
         {
             var roles = await UserManager.GetRolesAsync(user);
             isAdmin = roles.Contains("Admin");
+            isConductor = roles.Contains("Conductor");
         }
     }
 }
@@ -44,11 +46,16 @@
                             {
                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="AdminHome">Home</a>
                             }
+                            else if (isConductor)
+                            {
+                                <a class="nav-link text-dark" asp-controller="Conductor" asp-action="Scanner">Home</a>
+                            }
                             else
                             {
                                 <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
                             }
                         </li>
+
 
                         <li class="nav-item">
                             @if (isAdmin)
@@ -77,6 +84,14 @@
                             @if (isAdmin)
                             {
                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="Earnings">Daily Earnings</a>
+                            }
+                        </li>
+
+                        <!-- NEW: Conductor Dashboard (Conductor Only) -->
+                        <li class="nav-item">
+                            @if (isConductor)
+                            {
+                                <a class="nav-link text-dark" asp-controller="Conductor" asp-action="Dashboard">Conductor Dashboard</a>
                             }
                         </li>
 

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -85,7 +85,6 @@ namespace TransportationBookingSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
         public async Task<IActionResult> BookingForm(Passenger model)
         {
             // Fill required fields
@@ -96,7 +95,7 @@ namespace TransportationBookingSystem.Controllers
             model.UserId ??= _userManager.GetUserId(User);
             model.Status ??= "Pending";
 
-            // Lookup selected destination to set Fare, DepartureTime, ArrivalTime
+            // Lookup selected destination
             var selectedDestination = await _context.Destinations
                 .FirstOrDefaultAsync(d => d.Name == model.Destination);
 
@@ -113,18 +112,19 @@ namespace TransportationBookingSystem.Controllers
                 return View("Booking", model);
             }
 
-            // Save to database
+            // Check if booking already exists
             var existingPassenger = await _context.Book
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.BookingId == model.BookingId && p.UserId == model.UserId);
+                .FirstOrDefaultAsync(p => p.BookingId == model.BookingId
+                                       && p.UserId == model.UserId);
 
             if (existingPassenger == null)
             {
-                // Generate QR pointing to Conductor verify page
+                // ✔ FIXED: Create correct verify URL
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                var verifyUrl = $"{baseUrl}/Conductor/VerifyBooking?bookingId={model.BookingId}";
+                model.QRCodeImage = GenerateQrCodeBase64(model.BookingId);
 
-                model.QRCodeImage = GenerateQrCodeBase64(verifyUrl);
+
                 model.PaymentStatus = "Unpaid";
                 model.DatePaid = null;
 
@@ -137,9 +137,10 @@ namespace TransportationBookingSystem.Controllers
 
             await _context.SaveChangesAsync();
 
-            // Redirect to Receipt page
+            // Redirect to receipt
             return RedirectToAction("Receipt", "Home", new { id = model.BookingId });
         }
+
 
 
         public async Task<IActionResult> DeleteBook(string id)

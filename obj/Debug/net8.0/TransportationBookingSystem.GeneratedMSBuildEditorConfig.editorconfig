@@ -60,6 +60,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVmlld0FsbEJvb2tpbmdzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Conductor/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yXERhc2hib2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Conductor/Scanner.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yXFNjYW5uZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Conductor/Verify.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yXFZlcmlmeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Conductor/VerifyBooking.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yXFZlcmlmeUJvb2tpbmcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

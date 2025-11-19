@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TransportationBookingSystem.Models;
 using TransportationBookingSystem.Services;
+using TransportationBookingSystem.Data;   // <-- Add this
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +19,21 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
+
+// Add custom services
 builder.Services.AddScoped<PassengersService>();
 
 var app = builder.Build();
+
+// ----------------------
+// 🔥 Run Seeder Here
+// ----------------------
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await SeedData.Initialize(services);   // <-- Runs role + conductor + admin seeding
+}
+// ----------------------
 
 if (!app.Environment.IsDevelopment())
 {
@@ -33,7 +46,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); //  Add this line
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

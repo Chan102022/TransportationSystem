@@ -1,0 +1,72 @@
+﻿@model List<TransportationBookingSystem.Models.Passenger>
+
+@{
+    ViewData["Title"] = "Conductor Dashboard";
+}
+
+<div style="max-width:1000px; margin:40px auto; padding:25px; background:white; border:5px solid black; border-radius:12px;">
+    <h1 class="text-center mb-4" style="background:pink; padding:12px; border-radius:8px;">Conductor Dashboard</h1>
+
+    <div class="row mb-4" style="display:flex; gap:12px; justify-content:space-between;">
+        <div style="flex:1; padding:16px; border:2px solid black; border-radius:8px; background:#fff3cd; text-align:center;">
+            <h5>Total Passengers (Today)</h5>
+            <p style="font-size:24px; margin:6px 0;">@ViewBag.TotalPassengers</p>
+        </div>
+
+        <div style="flex:1; padding:16px; border:2px solid black; border-radius:8px; background:#d4edda; text-align:center;">
+            <h5>Paid</h5>
+            <p style="font-size:24px; margin:6px 0;">@ViewBag.PaidPassengers</p>
+        </div>
+
+        <div style="flex:1; padding:16px; border:2px solid black; border-radius:8px; background:#f8d7da; text-align:center;">
+            <h5>Unpaid</h5>
+            <p style="font-size:24px; margin:6px 0;">@ViewBag.UnpaidPassengers</p>
+        </div>
+
+        <div style="flex:1; padding:16px; border:2px solid black; border-radius:8px; background:#e6ffed; text-align:center;">
+            <h5>Earnings (Today)</h5>
+            <p style="font-size:24px; margin:6px 0; color:green;">₱@(((decimal)ViewBag.TotalEarnings).ToString("N2"))</p>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Today's Bookings</h4>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Booking ID</th>
+                <th>Name</th>
+                <th>Destination</th>
+                <th>Fare</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Paid At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model)
+            {
+                <tr>
+                    <td>@b.BookingId</td>
+                    <td>@b.Name</td>
+                    <td>@b.Destination</td>
+                    <td>₱@b.Fare.ToString("N2")</td>
+                    <td>@b.Status</td>
+                    <td>@b.PaymentStatus</td>
+                    <td>@(b.DatePaid?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="Conductor" asp-action="Verify" asp-route-id="@b.BookingId">Open</a>
+                        @if (b.PaymentStatus != "Paid")
+                        {
+                            <form asp-controller="Conductor" asp-action="MarkAsPaid" method="post" style="display:inline;">
+                                <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                <button type="submit" class="btn btn-sm btn-success ms-1">Mark Paid</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
