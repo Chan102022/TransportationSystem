@@ -79,18 +79,28 @@
 
                         <!-- Actions -->
                         <td style="border: 2px solid black; padding: 10px;">
+
                             @if (passenger.Status != "Confirmed")
                             {
                                 <a asp-action="Booking" asp-route-id="@passenger.BookingId"
                                    style="margin-right: 10px; color: blue; text-decoration: underline;">Edit</a>
 
                                 <a asp-action="DeleteBook" asp-route-id="@passenger.BookingId"
-                                   style="color: red; text-decoration: underline;">Delete</a>
+                                   style="margin-right: 10px; color: red; text-decoration: underline;">Delete</a>
                             }
                             else
                             {
-                                <span style="color: gray; font-weight: bold;">Locked</span>
+                                <span style="color: gray; font-weight: bold; margin-right: 10px;">Locked</span>
                             }
+
+                            <!-- View Receipt Button -->
+                            <a asp-controller="Home"
+                               asp-action="Receipt"
+                               asp-route-id="@passenger.BookingId"
+                               style="color: green; font-weight: bold; text-decoration: underline;">
+                                View Receipt
+                            </a>
+
                         </td>
                     </tr>
                 }

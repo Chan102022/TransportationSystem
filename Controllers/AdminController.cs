@@ -196,6 +196,27 @@ namespace TransportationBookingSystem.Controllers
 
             return RedirectToAction("Dashboard");
         }
+        public async Task<IActionResult> Earnings(DateTime? date)
+        {
+            // If no date provided, use today
+            var selectedDate = date?.Date ?? DateTime.Today;
+
+            // Fetch all PAID bookings on that day
+            var paidBookings = await _context.Book
+                .Where(b => b.PaymentStatus == "Paid"
+                            && b.DatePaid.HasValue
+                            && b.DatePaid.Value.Date == selectedDate)
+                .ToListAsync();
+
+            // Calculate total earned
+            decimal total = paidBookings.Sum(p => p.Fare);
+
+            ViewBag.SelectedDate = selectedDate.ToString("yyyy-MM-dd");
+            ViewBag.TotalEarnings = total;
+
+            return View(paidBookings);
+        }
+
 
     }
 }

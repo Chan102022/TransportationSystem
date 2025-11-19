@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransportationBookingSystem.Models;
 using TransportationBookingSystem.Services;
+using QRCoder;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace TransportationBookingSystem.Controllers
 {
@@ -117,6 +120,14 @@ namespace TransportationBookingSystem.Controllers
 
             if (existingPassenger == null)
             {
+                // Generate QR pointing to Conductor verify page
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                var verifyUrl = $"{baseUrl}/Conductor/VerifyBooking?bookingId={model.BookingId}";
+
+                model.QRCodeImage = GenerateQrCodeBase64(verifyUrl);
+                model.PaymentStatus = "Unpaid";
+                model.DatePaid = null;
+
                 await _context.Book.AddAsync(model);
             }
             else
@@ -125,7 +136,9 @@ namespace TransportationBookingSystem.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Book));
+
+            // Redirect to Receipt page
+            return RedirectToAction("Receipt", "Home", new { id = model.BookingId });
         }
 
 
@@ -174,5 +187,32 @@ namespace TransportationBookingSystem.Controllers
 
             return View(model);
         }
+        private string GenerateQrCodeBase64(string text)
+        {
+            using (var qrGenerator = new QRCodeGenerator())
+            using (var qrData = qrGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q))
+            using (var qrCode = new QRCode(qrData))
+            using (var bitmap = qrCode.GetGraphic(20))
+            using (var ms = new MemoryStream())
+            {
+                bitmap.Save(ms, ImageFormat.Png);
+                return "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+            }
+        }
+        public async Task<IActionResult> Receipt(string id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var booking = await _context.Book
+                .FirstOrDefaultAsync(p => p.BookingId == id && p.UserId == userId);
+
+            if (booking == null)
+                return NotFound();
+
+            return View(booking);
+        }
+
+
+
     }
 }

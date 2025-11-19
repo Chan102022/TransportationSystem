@@ -52,8 +52,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGVzdGluYXRpb25zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Admin/Earnings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWFybmluZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Admin/ViewAllBookings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVmlld0FsbEJvb2tpbmdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Conductor/VerifyBooking.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yXFZlcmlmeUJvb2tpbmcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Home/Book.cshtml]
@@ -66,6 +74,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Home/Receipt.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZWNlaXB0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Huawei/Desktop/TransportationBookingSystem/TransportationBookingSystem/Views/Shared/Error.cshtml]

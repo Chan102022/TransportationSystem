@@ -1,0 +1,26 @@
+﻿@model TransportationBookingSystem.Models.Passenger
+
+<h2>Booking Verification</h2>
+
+<p><b>Name:</b> @Model.Name</p>
+<p><b>Destination:</b> @Model.Destination</p>
+<p><b>Fare:</b> ₱@Model.Fare.ToString("N2")</p>
+<p><b>Status:</b> @Model.PaymentStatus</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="MarkPaid" method="post">
+    <input type="hidden" name="bookingId" value="@Model.BookingId" />
+
+    @if (Model.PaymentStatus == "Paid")
+    {
+        <button disabled class="btn btn-success">Already Paid</button>
+    }
+    else
+    {
+        <button class="btn btn-success">Mark as Paid</button>
+    }
+</form>

@@ -188,4 +188,10 @@ C:\Users\Huawei\Desktop\TransportationBookingSystem\TRansportationBookingSystem\
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TRansportationBookingSystem\obj\Debug\net8.0\TransportationBookingSystem.pdb
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TRansportationBookingSystem\obj\Debug\net8.0\TransportationBookingSystem.genruntimeconfig.cache
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TRansportationBookingSystem\obj\Debug\net8.0\ref\TransportationBookingSystem.dll
+C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\QRCoder.dll
+C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\System.Drawing.Common.dll
+C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
+C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\Users\Huawei\Desktop\TransportationBookingSystem\TransportationBookingSystem\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

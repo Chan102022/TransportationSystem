@@ -1,0 +1,21 @@
+﻿@model TransportationBookingSystem.Models.Passenger
+
+<div style="width:450px; margin:auto; border:3px solid black; padding:20px; background:white;">
+    <h3 class="text-center">BOOKING RECEIPT</h3>
+
+    <p><b>Name:</b> @Model.Name</p>
+    <p><b>Destination:</b> @Model.Destination</p>
+    <p><b>Fare:</b> ₱@Model.Fare.ToString("N2")</p>
+    <p><b>Seat No:</b> @Model.SeatNo</p>
+    <p><b>Departure:</b> @Model.DepartureTime</p>
+    <p><b>Booking ID:</b> @Model.BookingId</p>
+
+    <!-- QR Code -->
+    <div style="text-align:center; margin-top:15px;">
+        <img src="@Model.QRCodeImage" width="200" height="200" />
+    </div>
+
+    <div style="text-align:center; margin-top:20px;">
+        <button onclick="window.print()" class="btn btn-dark">Print Receipt</button>
+    </div>
+</div>

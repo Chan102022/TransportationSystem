@@ -38,36 +38,32 @@
                 </button>
                 <div style="background-color:pink;" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-         
+
                         <li class="nav-item">
                             @if (isAdmin)
                             {
                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="AdminHome">Home</a>
-
                             }
                             else
                             {
                                 <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
-
                             }
                         </li>
+
                         <li class="nav-item">
                             @if (isAdmin)
                             {
                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="Destinations">Add Booking</a>
-                                
                             }
                             else
                             {
                                 <a class="nav-link text-dark" asp-controller="Home" asp-action="Booking">Book</a>
-                                
                             }
                         </li>
-              
+
                         <li class="nav-item">
                             @if (isAdmin)
                             {
-                             
                                 <a class="nav-link text-dark" asp-controller="Admin" asp-action="Dashboard">Edit Existing Booking</a>
                             }
                             else
@@ -75,7 +71,17 @@
                                 <a class="nav-link text-dark" asp-controller="Home" asp-action="Book">View Existing Booking</a>
                             }
                         </li>
+
+                        <!-- NEW: Daily Earnings (Admin Only) -->
+                        <li class="nav-item">
+                            @if (isAdmin)
+                            {
+                                <a class="nav-link text-dark" asp-controller="Admin" asp-action="Earnings">Daily Earnings</a>
+                            }
+                        </li>
+
                     </ul>
+
 
                     <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))

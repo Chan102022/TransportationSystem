@@ -1,0 +1,66 @@
+﻿@model List<TransportationBookingSystem.Models.Passenger>
+
+@{
+    ViewData["Title"] = "Daily Earnings";
+}
+
+<body style="background-color: pink; font-family: Arial;">
+    <div class="container mt-4"
+         style="background:white; border:5px solid black; border-radius:20px; padding:30px;">
+
+        <h1 class="text-center mb-4">Daily Earnings Report</h1>
+
+        <!-- Date Selector -->
+        <form method="get" asp-action="Earnings" class="mb-4 text-center">
+            <label><strong>Select Date:</strong></label>
+            <input type="date" name="date" value="@ViewBag.SelectedDate"
+                   class="form-control d-inline-block" style="width:200px;" />
+            <button type="submit" class="btn btn-outline-dark ms-2">Filter</button>
+        </form>
+
+        <!-- Total Earnings -->
+        <div class="alert alert-info text-center"
+             style="font-size: 1.3rem; border:2px solid black;">
+            <strong>Total Earnings:</strong> ₱@(((decimal)ViewBag.TotalEarnings).ToString("N2"))
+
+
+
+
+        </div>
+
+        <!-- Table of paid bookings -->
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Name</th>
+                    <th>Destination</th>
+                    <th>Fare</th>
+                    <th>Seat No</th>
+                    <th>Departure</th>
+                    <th>Paid At</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var booking in Model)
+                {
+                    <tr>
+                        <td>@booking.BookingId</td>
+                        <td>@booking.Name</td>
+                        <td>@booking.Destination</td>
+                        <td>₱@booking.Fare.ToString("N2")</td>
+                        <td>@booking.SeatNo</td>
+                        <td>@booking.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@booking.DatePaid?.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (Model.Count == 0)
+        {
+            <p class="text-center"><em>No paid bookings found for this date.</em></p>
+        }
+
+    </div>
+</body>

@@ -39,5 +39,9 @@ namespace TransportationBookingSystem.Models
         public DateTime DepartureTime { get; set; }
         public DateTime ArrivalTime { get; set; }
 
+        public string? QRCodeImage { get; set; }
+        public string PaymentStatus { get; set; } = "Unpaid";
+        public DateTime? DatePaid { get; set; }
+
     }
 }
