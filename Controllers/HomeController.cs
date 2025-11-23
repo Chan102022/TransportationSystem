@@ -35,6 +35,17 @@ namespace TransportationBookingSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var destinations = await _context.Destinations.ToListAsync();
+
+            // AUTO-SET TODAY'S DATE FOR DISPLAY ONLY
+            foreach (var d in destinations)
+            {
+                d.DepartureTime = DateTime.Today.AddHours(d.DepartureTime.Hour)
+                                                .AddMinutes(d.DepartureTime.Minute);
+
+                d.ArrivalTime = DateTime.Today.AddHours(d.ArrivalTime.Hour)
+                                              .AddMinutes(d.ArrivalTime.Minute);
+            }
+
             ViewBag.Destinations = destinations;
             return View();
         }
@@ -50,21 +61,39 @@ namespace TransportationBookingSystem.Controllers
             return View(bookings);
         }
 
-        // BOOKING PAGE (CREATES or EDITS BOOKING)
+        // BOOKING PAGE (CREATE OR EDIT)
         public async Task<IActionResult> Booking(string? id)
         {
             var userId = _userManager.GetUserId(User);
 
+            // load raw destinations
             var destinations = await _context.Destinations.ToListAsync();
+
+            // AUTO-SET TODAY'S DATE FOR DROPDOWN DISPLAY
+            foreach (var d in destinations)
+            {
+                d.DepartureTime = DateTime.Today.AddHours(d.DepartureTime.Hour)
+                                                .AddMinutes(d.DepartureTime.Minute);
+
+                d.ArrivalTime = DateTime.Today.AddHours(d.ArrivalTime.Hour)
+                                              .AddMinutes(d.ArrivalTime.Minute);
+            }
+
             ViewBag.Destinations = destinations;
 
-            // ============================
-            // 1️⃣ USER CLICKED A DESTINATION CARD
-            // ============================
+            // USER CLICKED DESTINATION CARD (id is the destination name or id depending on your link)
             if (!string.IsNullOrEmpty(id))
             {
-                var selectedDestination = await _context.Destinations
-                    .FirstOrDefaultAsync(d => d.Name == id);
+                // try to match by name first, if id is numeric use Id match (safe)
+                Destination selectedDestination = null;
+                if (int.TryParse(id, out int parsedId))
+                {
+                    selectedDestination = destinations.FirstOrDefault(d => d.Id == parsedId);
+                }
+                if (selectedDestination == null)
+                {
+                    selectedDestination = destinations.FirstOrDefault(d => d.Name == id);
+                }
 
                 if (selectedDestination != null)
                 {
@@ -75,8 +104,9 @@ namespace TransportationBookingSystem.Controllers
                         SeatNo = _passengersService.GenerateNextSeatNo(),
                         BookingDate = DateTime.Now,
                         UserId = userId,
+                        Status = "Pending",
 
-                        // Auto-fill details from clicked card
+                        DestinationId = selectedDestination.Id,   // NEW: bind Id
                         Destination = selectedDestination.Name,
                         Fare = selectedDestination.Fare,
                         DepartureTime = selectedDestination.DepartureTime,
@@ -86,26 +116,28 @@ namespace TransportationBookingSystem.Controllers
                     return View(newPassenger);
                 }
 
-                // ============================
-                // 2️⃣ USER IS EDITING AN EXISTING BOOKING
-                // ============================
+                // EDITING EXISTING BOOKING
                 var passengerInDb = await _context.Book
                     .FirstOrDefaultAsync(p => p.BookingId == id && p.UserId == userId);
 
                 if (passengerInDb != null)
+                {
+                    // ensure dropdown shows the selected schedule correctly (DestinationId is present on model)
                     return View(passengerInDb);
+                }
 
                 return NotFound();
             }
 
-            // Default new booking
+            // BLANK BOOKING
             var blankPassenger = new Passenger
             {
                 BookingId = _passengersService.GenerateNextBookingId(),
                 BusNo = _passengersService.GenerateNextBusNo(),
                 SeatNo = _passengersService.GenerateNextSeatNo(),
                 BookingDate = DateTime.Now,
-                UserId = userId
+                UserId = userId,
+                Status = "Pending"
             };
 
             return View(blankPassenger);
@@ -115,12 +147,13 @@ namespace TransportationBookingSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> BookingForm(Passenger model)
-        {// 🚫 Prevent duplicate booking for same user / same destination / same name
+        {
+            // Prevent duplicate booking
             var duplicate = await _context.Book
                 .AnyAsync(b => b.UserId == model.UserId
-                            && b.Destination == model.Destination
+                            && b.DestinationId == model.DestinationId
                             && b.Name == model.Name
-                            && b.Status != "Canceled"); // You can edit this rule
+                            && b.Status != "Canceled");
 
             if (duplicate)
             {
@@ -132,17 +165,30 @@ namespace TransportationBookingSystem.Controllers
             model.BookingId ??= _passengersService.GenerateNextBookingId();
             model.BusNo ??= _passengersService.GenerateNextBusNo();
             model.SeatNo ??= _passengersService.GenerateNextSeatNo();
+
             model.BookingDate = DateTime.Now;
             model.UserId ??= _userManager.GetUserId(User);
             model.Status ??= "Pending";
 
-            // Fill destination data
-            var dest = await _context.Destinations.FirstOrDefaultAsync(d => d.Name == model.Destination);
+            // LOOKUP DESTINATION BY ID (if present). Do NOT overwrite the DepartureTime/ArrivalTime that came from the form.
+            Destination dest = null;
+            if (model.DestinationId.HasValue)
+            {
+                dest = await _context.Destinations.FirstOrDefaultAsync(d => d.Id == model.DestinationId.Value);
+            }
+            else if (!string.IsNullOrEmpty(model.Destination))
+            {
+                // fallback to name if legacy posts exist
+                dest = await _context.Destinations.FirstOrDefaultAsync(d => d.Name == model.Destination);
+            }
+
             if (dest != null)
             {
                 model.Fare = dest.Fare;
-                model.DepartureTime = dest.DepartureTime;
-                model.ArrivalTime = dest.ArrivalTime;
+                if (string.IsNullOrEmpty(model.Destination))
+                    model.Destination = dest.Name;
+                // IMPORTANT: DO NOT set model.DepartureTime = dest.DepartureTime
+                // the form already provided the user-visible departure/arrival values.
             }
 
             if (!ModelState.IsValid)
@@ -208,7 +254,7 @@ namespace TransportationBookingSystem.Controllers
             }
         }
 
-        // RECEIPT PAGE
+        // RECEIPT
         public async Task<IActionResult> Receipt(string id)
         {
             var userId = _userManager.GetUserId(User);
@@ -221,22 +267,20 @@ namespace TransportationBookingSystem.Controllers
 
             return View(booking);
         }
+
         [HttpGet]
         public IActionResult GetPassengersByRoute(int id)
         {
-            // Step 1: find destination name by ID
-            var destination = _context.Destinations
-                .FirstOrDefault(d => d.Id == id);
+            var destination = _context.Destinations.FirstOrDefault(d => d.Id == id);
 
             if (destination == null)
                 return Json(new { error = "Destination not found" });
 
             string routeName = destination.Name;
 
-            // Step 2: get all bookings for this route for TODAY
             var passengers = _context.Book
-                .Where(b => b.Destination == routeName &&
-                            b.DepartureTime.Date == DateTime.Now.Date)
+                .Where(b => b.DestinationId == id &&
+                            b.DepartureTime.Date == DateTime.Today)
                 .Select(b => new
                 {
                     name = b.Name,
@@ -247,7 +291,5 @@ namespace TransportationBookingSystem.Controllers
 
             return Json(passengers);
         }
-
-
     }
 }

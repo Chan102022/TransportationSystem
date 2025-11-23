@@ -19,35 +19,39 @@
 
 <script>
     const beepSound = document.getElementById("beepSound");
+    const html5QrCode = new Html5Qrcode("reader");
 
-    function onScanSuccess(decodedText, decodedResult) {
+    function onScanSuccess(decodedText) {
 
-        // Stop scanning once successful
+        // Stop scanning after success
         html5QrCode.stop();
-
-        // Play beep
         beepSound.play();
 
-        // Show result on screen
         document.getElementById("result").innerText = "Scanned: " + decodedText;
 
-        // Redirect after a short delay
         setTimeout(() => {
+
+            // CASE 1 - QR contains a FULL URL
+            if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
+                window.location.href = decodedText;
+                return;
+            }
+
+            // CASE 2 - QR contains ONLY the booking ID
             window.location.href = `/Conductor/Verify?id=${decodedText}`;
+
         }, 800);
     }
 
-    const html5QrCode = new Html5Qrcode("reader");
-
+    // Start camera
     Html5Qrcode.getCameras().then(devices => {
         if (devices && devices.length) {
+
             let cameraId = devices[0].id;
+
             html5QrCode.start(
                 cameraId,
-                {
-                    fps: 10,
-                    qrbox: 250
-                },
+                { fps: 10, qrbox: 250 },
                 onScanSuccess
             );
         }

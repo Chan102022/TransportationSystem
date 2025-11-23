@@ -12,6 +12,8 @@ namespace TransportationBookingSystem.Models
         [Required]
         public string? Name { get; set; }
 
+        public int? DestinationId { get; set; }     // NEW FIELD
+
         [Required]
         public string Destination { get; set; }
 
@@ -36,12 +38,13 @@ namespace TransportationBookingSystem.Models
         [Required]
         [Column(TypeName = "decimal(10,2)")]
         public decimal Fare { get; set; }
+
         public DateTime DepartureTime { get; set; }
         public DateTime ArrivalTime { get; set; }
 
         public string? QRCodeImage { get; set; }
         public string PaymentStatus { get; set; } = "Unpaid";
         public DateTime? DatePaid { get; set; }
-
     }
+
 }

@@ -1,4 +1,5 @@
 ﻿@model TransportationBookingSystem.Models.Passenger
+
 @{
     ViewData["Title"] = "Booking";
     var destinations = ViewBag.Destinations as List<TransportationBookingSystem.Models.Destination>
@@ -16,32 +17,36 @@
             <div asp-validation-summary="All" class="text-danger"></div>
 
             <!-- HIDDEN FIELDS -->
-            <input type="hidden" name="BookingId" value="@Model.BookingId" />
-            <input type="hidden" name="BusNo" value="@Model.BusNo" />
-            <input type="hidden" name="SeatNo" value="@Model.SeatNo" />
-            <input type="hidden" name="BookingDate" value="@Model.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")" />
-            <input type="hidden" name="UserId" value="@Model.UserId" />
-            <input type="hidden" name="Status" value="@Model.Status ?? "Pending"" />
+            <input asp-for="BookingId" type="hidden" />
+            <input asp-for="BusNo" type="hidden" />
+            <input asp-for="SeatNo" type="hidden" />
+            <input asp-for="BookingDate" type="hidden" />
+            <input asp-for="UserId" type="hidden" />
+            <input asp-for="Status" type="hidden" />
+
+            <!-- Fixed Hidden Fields (no tag helper) -->
+            <input type="hidden" name="DestinationId" id="destinationIdHidden" value="@Model.DestinationId" />
+            <input type="hidden" name="Destination" id="destinationNameHidden" value="@Model.Destination" />
 
             <!-- READONLY FIELDS -->
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Bus No</label>
                 <div class="col-sm-9">
-                    <input class="form-control" type="text" value="@Model.BusNo" readonly />
+                    <input asp-for="BusNo" class="form-control" readonly />
                 </div>
             </div>
 
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Seat No</label>
                 <div class="col-sm-9">
-                    <input class="form-control" type="text" value="@Model.SeatNo" readonly />
+                    <input asp-for="SeatNo" class="form-control" readonly />
                 </div>
             </div>
 
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Booking Date</label>
                 <div class="col-sm-9">
-                    <input class="form-control" type="text" value="@Model.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")" readonly />
+                    <input class="form-control" value="@Model.BookingDate.ToString("yyyy-MM-dd HH:mm:ss")" readonly />
                 </div>
             </div>
 
@@ -58,44 +63,30 @@
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Destination</label>
                 <div class="col-sm-9">
-
                     <select id="destinationSelect"
                             class="form-select"
-                            name="Destination"
-                            @(Model.Destination != null ? "disabled=\"disabled\"" : "")
+                            @(Model.DestinationId != null ? "disabled=\"disabled\"" : "")
                             required>
 
-                        @if (Model.Destination == null)
+                        @if (Model.DestinationId == null)
                         {
-                            <option value="" disabled selected>Select Destination</option>
-                        }
-                        else
-                        {
-                            <option value="" disabled>Select Destination</option>
+                            <option disabled selected>Select Destination</option>
                         }
 
                         @foreach (var dest in destinations)
                         {
-                            var isSelected = Model.Destination == dest.Name ? "selected=\"selected\"" : "";
-                            var fare = dest.Fare.ToString("F2");
-                            var dep = dest.DepartureTime.ToString("yyyy-MM-dd HH:mm");
-                            var arr = dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm");
-
-@:<option value="@dest.Name"
-@:        data-fare="@fare"
-@:        data-departure="@dep"
-@:        data-arrival="@arr"
-@:        @Html.Raw(isSelected)>    
-@:@dest.Name | Fare: ₱@fare | Departure: @dep | Arrival: @arr
-@:</option>
+                            <option value="@dest.Id"
+                                    data-name="@dest.Name"
+                                    data-fare="@dest.Fare"
+                                    data-departure="@dest.DepartureTime.ToString("yyyy-MM-dd HH:mm")"
+                                    data-arrival="@dest.ArrivalTime.ToString("yyyy-MM-dd HH:mm")"
+                                    selected="@(Model.DestinationId == dest.Id ? "selected" : null)">
+                                @dest.Name | Fare: ₱@dest.Fare.ToString("F2")
+                                | Departure: @dest.DepartureTime
+                                | Arrival: @dest.ArrivalTime
+                            </option>
                         }
                     </select>
-
-                    <!-- IF LOCKED, SUBMIT VIA HIDDEN INPUT -->
-                    @if (Model.Destination != null)
-                    {
-                        <input type="hidden" name="Destination" value="@Model.Destination" />
-                    }
                 </div>
             </div>
 
@@ -103,29 +94,28 @@
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Departure Time</label>
                 <div class="col-sm-9">
-                    <input id="departureDisplay" class="form-control" type="text" name="DepartureTime" readonly />
+                    <input id="departureDisplay" asp-for="DepartureTime" class="form-control" readonly />
                 </div>
             </div>
 
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Arrival Time</label>
                 <div class="col-sm-9">
-                    <input id="arrivalDisplay" class="form-control" type="text" name="ArrivalTime" readonly />
+                    <input id="arrivalDisplay" asp-for="ArrivalTime" class="form-control" readonly />
                 </div>
             </div>
 
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label">Fare</label>
                 <div class="col-sm-9">
-                    <input id="fareDisplay" class="form-control" type="text" name="Fare" readonly />
+                    <input id="fareDisplay" asp-for="Fare" class="form-control" readonly />
                 </div>
             </div>
 
             <div class="text-center">
-                <button id="simpleAlertBtn" type="submit" class="btn btn-outline-dark px-5 py-2 fw-bold" style="border-width: 3px;">
-    Book Now
-</button>
-
+                <button type="submit" class="btn btn-outline-dark px-5 py-2 fw-bold" style="border-width: 3px;">
+                    Book Now
+                </button>
             </div>
 
         </form>
@@ -135,47 +125,49 @@
         @await Html.PartialAsync("_ValidationScriptsPartial")
 
         <script>
-    const destinationSelect = document.getElementById("destinationSelect");
-    const fareDisplay = document.getElementById("fareDisplay");
-    const departureDisplay = document.getElementById("departureDisplay");
-    const arrivalDisplay = document.getElementById("arrivalDisplay");
+                    const destinationSelect = document.getElementById("destinationSelect");
+                    const fareField = document.getElementById("fareDisplay");
+                    const departureField = document.getElementById("departureDisplay");
+                    const arrivalField = document.getElementById("arrivalDisplay");
 
-    function updateFields() {
-        const opt = destinationSelect.selectedOptions[0];
-        if (!opt) return;
+                    function updateFields() {
+                        const opt = destinationSelect.selectedOptions[0];
+                        if (!opt) return;
 
-        fareDisplay.value = parseFloat(opt.dataset.fare).toFixed(2);
-        departureDisplay.value = opt.dataset.departure;
-        arrivalDisplay.value = opt.dataset.arrival;
+                        fareField.value = parseFloat(opt.dataset.fare).toFixed(2);
+                        departureField.value = opt.dataset.departure;
+                        arrivalField.value = opt.dataset.arrival;
+
+                        // Update hidden fields
+                        document.getElementById("destinationIdHidden").value = opt.value;
+                        document.getElementById("destinationNameHidden").value = opt.dataset.name;
+                    }
+
+                    destinationSelect.addEventListener("change", updateFields);
+                    window.addEventListener("load", updateFields);
+
+                    // Confirmation popup
+                    document.querySelector("form").addEventListener("submit", function (e) {
+                        const name = document.querySelector("input[name='Name']").value;
+                        const destination = document.getElementById("destinationNameHidden").value;
+                        const fare = fareField.value;
+                        const dep = departureField.value;
+                        const arr = arrivalField.value;
+
+                        const message =
+            `Are you sure you want to book this trip?
+
+            Passenger Name: ${name}
+            Destination: ${destination}
+            Fare: ₱${fare}
+            Departure: ${dep}
+            Arrival: ${arr}`;
+
+                        if (!confirm(message)) {
+                            e.preventDefault();
+                        }
+                    });
+        </script>
     }
 
-    destinationSelect.addEventListener("change", updateFields);
-    window.addEventListener("load", updateFields);
-
-    // SIMPLE CONFIRMATION BEFORE SUBMITTING
-    document.querySelector("form").addEventListener("submit", function (e) {
-
-        let name = document.querySelector("input[name='Name']").value;
-        let destination = destinationSelect.value;
-        let fare = fareDisplay.value;
-        let dep = departureDisplay.value;
-        let arr = arrivalDisplay.value;
-
-        let message =
-`Are you sure you want to book this trip?
-
-Passenger Name: ${name}
-Destination: ${destination}
-Fare: ₱${fare}
-Departure: ${dep}
-Arrival: ${arr}`;
-
-        if (!confirm(message)) {
-            e.preventDefault(); // STOP submit
-        }
-    });
-</script>
-
-
-    }
 </body>
